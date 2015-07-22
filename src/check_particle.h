@@ -12,6 +12,6 @@
 *********************************************************/
 bool validate_particle(Particle& particle, const Grid& grid);
 
-bool check_particle_move(Particle& particle, const DblVector dr);
+bool check_particle_move(Particle& particle, const Grid& grid, const DblVector& dr);
 
 #endif // CHECK_PARTICLE_H

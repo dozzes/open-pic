@@ -7,6 +7,7 @@
 #include "config.h"
 #include "grid.h"
 #include "particles.h"
+#include "gather_scatter.h"
 #include "call_lua_function.h"
 
 #include "check_particle.h"
@@ -69,7 +70,7 @@ bool validate_particle(Particle& particle, const Grid& grid)
    return !particle.is_absorbed;
 }
 
-bool check_particle_move(Particle& particle, const DblVector dr)
+bool check_particle_move(Particle& particle, const Grid& grid, const DblVector& dr)
 {
    const double h = PIC::Config::h();
    const double h_2 = 0.5*h;
@@ -78,17 +79,40 @@ bool check_particle_move(Particle& particle, const DblVector dr)
    {
       const index_t step = PIC::Config::current_time_step();
 
-      const std::string msg = str(boost::format("Step = %1% :\n\tError: CFL: particle's home cell = (%2%, %3%, %4%);"
+      Grid::NodeType point_val;
+      PIC::from_grid_to_point(grid, particle.r, point_val);
+
+      //(particle.v.abs()),(particle.v.x), (particle.v.y), (particle.v.z),
+      //(point_val.B.abs()),(point_val.B.x), (point_val.B.y), (point_val.B.z),
+      //(point_val.E.abs()),(point_val.E.x), (point_val.E.y), (point_val.E.z)
+
+      const index_t pi = static_cast<size_t>(particle.r.x/h);
+      const index_t pj = static_cast<size_t>(particle.r.y/h);
+      const index_t pk = static_cast<size_t>(particle.r.z/h);
+
+      const std::string msg = str(
+         boost::format(
+                       "Step = %1%:\n\tError CFL:"
+                       "\n\tparticle's home cell = (%2%, %3%, %4%);"
          "\n\tdr = (%5%, %6%, %7%),\n\tdr.abs() = %8%; h = %9%;"
-         "\n\tparticle [%10%] at (%11%, %12%, %13%)\n")
+                       "\n\tparticle [%10%] at (%11%, %12%, %13%)"
+                       "\n\tfield values at particle position:"
+                       "\n\t\t B = %14%, Bx = %15%, By = %16%, Bz = %17%"
+                       "\n\t\t E = %18%, Ex = %19%, Ey = %20%, Ez = %21%"
+                       "\n\t\t cell state = %22% (0 - active, 1 - absorptive, 2 - custom)" 
+                      )
          % step
-         % static_cast<size_t>(particle.r.x/h)
-         % static_cast<size_t>(particle.r.y/h)
-         % static_cast<size_t>(particle.r.z/h)
+                      % pi
+                      % pj
+                      % pk
          % dr.x % dr.y % dr.z % (dr.abs())
          % h
          % particle.group_name
-         % particle.r.x % particle.r.y % particle.r.z);
+                      % particle.r.x % particle.r.y % particle.r.z
+                      % point_val.B.abs() % point_val.B.x % point_val.B.y % point_val.B.z
+                      % point_val.E.abs() % point_val.E.x % point_val.E.y % point_val.E.z
+                      % grid(pi, pj, pk).state()
+      );
 
       const int tid = omp_get_thread_num();
       const std::string log_file_name = str(boost::format("opic_thread_%1%_error.log") % tid);

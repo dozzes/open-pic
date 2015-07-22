@@ -3,7 +3,6 @@
 
 #include <string>
 #include <iosfwd>
-#include <fstream>
 
 #include "opic_fwd.h"
 #include "constants.h"
@@ -161,7 +160,7 @@ namespace PIC
 
    private:
       static Parameters params;
-      static ofstream ofs_log;
+      static ofstream& ofs_log;
    };
 
    ostream& operator<<(ostream& out, const Config::Parameters& params);

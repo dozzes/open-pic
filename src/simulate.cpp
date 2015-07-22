@@ -33,6 +33,7 @@ void calc_magnetic_field_half_time(Grid& grid)
    const index_t to_kz = (grid.size_z() - kd);
 
    const double ctau_2h = Config::ctau_2h();
+
    for (index_t kx = kd; kx != to_kx; ++kx)
    for (index_t ky = kd; ky != to_ky; ++ky)
    for (index_t kz = kd; kz != to_kz; ++kz)
@@ -151,7 +152,7 @@ void move_particles_half_time(const Grid& grid,
                               Particles& particles,
                               const std::string& group_name)
 {
-   size_t removed_num = particles.remove_absorbed();
+   const size_t removed_num = particles.remove_absorbed();
 
    if (removed_num > 0)
    {
@@ -160,7 +161,7 @@ void move_particles_half_time(const Grid& grid,
 
    const double tau_2 = Config::tau_2();
 
-   long particles_num = particles.size();
+   const long particles_num = particles.size();
 
    long err_count = 0;
 
@@ -168,39 +169,39 @@ void move_particles_half_time(const Grid& grid,
    for (long p = 0; p < particles_num; ++p)
    {
       try
-	  {
-		  Particle& particle = particles[p];
+      {
+          Particle& particle = particles[p];
 
-		  if ((group_name == "all" || particle.group_name == group_name) &&
-			  validate_particle(particle, grid) &&
-			  (err_count == 0))
-		  {
-			  push_particle(grid, particle);
+          if ((group_name == "all" || particle.group_name == group_name) &&
+              validate_particle(particle, grid) &&
+              (err_count == 0))
+          {
+              push_particle(grid, particle);
 
-			  const DblVector dr(tau_2 * particle.v.x, tau_2 * particle.v.y, tau_2 * particle.v.z);
+              const DblVector dr(tau_2 * particle.v.x, tau_2 * particle.v.y, tau_2 * particle.v.z);
 
-			  if (check_particle_move(particle, dr))
-			  {
-				  particle.r.x += dr.x;
-				  particle.r.y += dr.y;
-				  particle.r.z += dr.z;
+              if (check_particle_move(particle, grid, dr))
+              {
+                  particle.r.x += dr.x;
+                  particle.r.y += dr.y;
+                  particle.r.z += dr.z;
 
-				  if(validate_particle(particle, grid))
-				  {
-					  const int thread_num = omp_get_thread_num();
-					  scatter_particle(particle, densityGrids[thread_num]);
-				  }
-			  }
-			  else
-			  {
-				  ++err_count;
-			  }
-		  }
-	  } 
-	  catch (...)
-	  {
-		  ++err_count;
-	  }
+                  if(validate_particle(particle, grid))
+                  {
+                      const int thread_num = omp_get_thread_num();
+                      scatter_particle(particle, densityGrids[thread_num]);
+                  }
+              }
+              else
+              {
+                  ++err_count;
+              }
+          }
+      } 
+      catch (...)
+      {
+          ++err_count;
+      }
    } // for (long p = 0; p < particles_num; ++p)
 
    if (err_count != 0)
@@ -222,7 +223,7 @@ void move_particles_full_time(const Grid& grid,
 {
    const double tau_2 = Config::tau_2();
 
-   long particles_num = particles.size();
+   const long particles_num = particles.size();
 
    #pragma omp parallel for
    for (long p = 0; p < particles_num; ++p)
@@ -486,7 +487,7 @@ void save_grid_node_data(const std::string& prefix, const GridType& grid)
     for(size_t i = 0; i != (grid.size_x()); ++i)  
     for(size_t j = 0; j != (grid.size_y()); ++j)
     {
-        const GridType::NodeType& c = grid(i,j,k);
+        const typename GridType::NodeType& c = grid(i,j,k);
         const double UP = sqrt(c.UP.x*c.UP.x + c.UP.y*c.UP.y + c.UP.z*c.UP.z);
         //const double B = sqrt(c.Bx*c.Bx + c.By*c.By + c.Bz*c.Bz);
         //const double E = sqrt(c.Ex*c.Ex + c.Ey*c.Ey + c.Ez*c.Ez);
@@ -549,7 +550,7 @@ void simulate(Grid& grid, Particles& particles)
       calc_magnetic_field_half_time(grid);
 
       // move particle on half time step.
-      if ( Config::is_on_save_step() )
+      if (Config::is_on_save_step())
       {
          ParticleGroups part_groups;
          const std::vector<std::string>& group_names = part_groups.group_names();
@@ -628,7 +629,7 @@ void simulate(Grid& grid, Particles& particles)
       normalize_NP(grid, grid);
       set_boundary_conditions("on_set_boundary_NP");
 
-      if ( Config::is_on_save_step() )
+      if (Config::is_on_save_step())
       {
          print_tm("Save particles data");
          save_particles(grid, particles);

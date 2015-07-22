@@ -39,7 +39,7 @@ namespace
        }
    }
 
-   int luabindErrorHandler(lua_State* lua)
+   int luabind_error_handler(lua_State* lua)
    {
        // log the error message
        luabind::object msg( luabind::from_stack(lua, -1 ) );
@@ -276,7 +276,7 @@ bool bind_to_lua(const char* lua_cfg_file_name,
       // assign parameters to a global in Lua
       globals(lua)["pic_parameters"] = &parameters;
 
-      set_pcall_callback(luabindErrorHandler);
+      set_pcall_callback(luabind_error_handler);
 
       int lua_status = luaL_dofile(lua, lua_cfg_file_name);
       if (lua_status != 0)

@@ -13,6 +13,7 @@ bool call_lua_function(const char* func_name)
    UseLua lua;
 
    bool ok = true;
+   
    try
    {
       luabind::call_function<void>(lua, func_name);
@@ -34,6 +35,7 @@ bool lua_validate_particle(Particle& particle)
    UseLua lua;
 
    bool ok = true;
+  
    try
    {
       ok = luabind::call_function<bool>(lua, "validate_particle", particle);

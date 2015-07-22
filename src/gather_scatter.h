@@ -163,37 +163,20 @@ double gather_vector(const GridT& grid,
     const double h = grid.step();
 
     // home cell node indexes
-    const index_t ip = static_cast<index_t>(atPoint.x/h - Centering::x());
-    const index_t jp = static_cast<index_t>(atPoint.y/h - Centering::y());
-    const index_t kp = static_cast<index_t>(atPoint.z/h - Centering::z());
+    const index_t pi = static_cast<index_t>(atPoint.x/h - Centering::x());
+    const index_t pj = static_cast<index_t>(atPoint.y/h - Centering::y());
+    const index_t pk = static_cast<index_t>(atPoint.z/h - Centering::z());
 
-    // point shift from home cell node
-    const double dx = atPoint.x/h - (ip + Centering::x());
-    const double dy = atPoint.y/h - (jp + Centering::y());
-    const double dz = atPoint.z/h - (kp + Centering::z());
+    double ret_val = 0.0;
 
-    // field interpolation weights
-    const double w_000 = (1.0 - dx)*(1.0 - dy)*(1.0 - dz);
-    const double w_001 = (1.0 - dx)*(1.0 - dy)*(dz);
-    const double w_010 = (1.0 - dx)*(dy)*(1.0 - dz);
-    const double w_011 = (1.0 - dx)*(dy)*(dz);
-    const double w_100 = (dx)*(1.0 - dy)*(1.0 - dz);
-    const double w_101 = (dx)*(1.0 - dy)*(dz);
-    const double w_110 = (dx)*(dy)*(1.0 - dz);
-    const double w_111 = (dx)*(dy)*(dz);
-
-    const double v_000 = grid(ip,jp,kp).*vec.*comp;
-    const double v_001 = grid(ip,jp,kp+1).*vec.*comp;
-    const double v_010 = grid(ip,jp+1,kp).*vec.*comp;
-    const double v_011 = grid(ip,jp+1,kp+1).*vec.*comp;
-    const double v_100 = grid(ip+1,jp,kp).*vec.*comp;
-    const double v_101 = grid(ip+1,jp,kp+1).*vec.*comp;
-    const double v_110 = grid(ip+1,jp+1,kp).*vec.*comp;
-    const double v_111 = grid(ip+1,jp+1,kp+1).*vec.*comp;
-
-    const double ret_val = w_000*v_000 + w_001*v_001 + w_010*v_010 +
-                           w_011*v_011 + w_100*v_100 + w_101*v_101 +
-                           w_110*v_110 + w_111*v_111;
+    for (size_t i = pi; i != pi+2; ++i)
+    for (size_t j = pj; j != pj+2; ++j)
+    for (size_t k = pk; k != pk+2; ++k)
+    {
+       ret_val += (grid(i,j,k).*vec.*comp) * R((i + Centering::x())*h - atPoint.x,
+                                               (j + Centering::y())*h - atPoint.y,
+                                               (k + Centering::z())*h - atPoint.z, h);
+    }
 
     return ret_val;
 }
@@ -226,37 +209,21 @@ double gather_scalar(const GridT& grid,
     const double h = grid.step();
 
     // home cell node indexes
-    const index_t i = static_cast<index_t>(atPoint.x/h - Centering::x());
-    const index_t j = static_cast<index_t>(atPoint.y/h - Centering::y());
-    const index_t k = static_cast<index_t>(atPoint.z/h - Centering::z());
+    const index_t pi = static_cast<index_t>(atPoint.x/h - Centering::x());
+    const index_t pj = static_cast<index_t>(atPoint.y/h - Centering::y());
+    const index_t pk = static_cast<index_t>(atPoint.z/h - Centering::z());
 
-    // point shift from home cell node
-    const double dx = atPoint.x/h - (i + Centering::x());
-    const double dy = atPoint.y/h - (j + Centering::y());
-    const double dz = atPoint.z/h - (k + Centering::z());
+    double ret_val = 0.0;
 
-    // field interpolation weights
-    const double w_000 = (1.0 - dx)*(1.0 - dy)*(1.0 - dz);
-    const double w_001 = (1.0 - dx)*(1.0 - dy)*(dz);
-    const double w_010 = (1.0 - dx)*(dy)*(1.0 - dz);
-    const double w_011 = (1.0 - dx)*(dy)*(dz);
-    const double w_100 = (dx)*(1.0 - dy)*(1.0 - dz);
-    const double w_101 = (dx)*(1.0 - dy)*(dz);
-    const double w_110 = (dx)*(dy)*(1.0 - dz);
-    const double w_111 = (dx)*(dy)*(dz);
+    for (size_t i = pi; i != pi+2; ++i)
+    for (size_t j = pj; j != pj+2; ++j)
+    for (size_t k = pk; k != pk+2; ++k)
+    {
+       ret_val += (grid(i,j,k).*val) * R((i + Centering::x())*h - atPoint.x,
+                                         (j + Centering::y())*h - atPoint.y,
+                                         (k + Centering::z())*h - atPoint.z, h);
+    }
 
-    const double v_000 = grid(i,j,k).*val;
-    const double v_001 = grid(i,j,k+1).*val;
-    const double v_010 = grid(i,j+1,k).*val;
-    const double v_011 = grid(i,j+1,k+1).*val;
-    const double v_100 = grid(i+1,j,k).*val;
-    const double v_101 = grid(i+1,j,k+1).*val;
-    const double v_110 = grid(i+1,j+1,k).*val;
-    const double v_111 = grid(i+1,j+1,k+1).*val;
-
-    const double ret_val = w_000*v_000 + w_001*v_001 + w_010*v_010 +
-                           w_011*v_011 + w_100*v_100 + w_101*v_101 +
-                           w_110*v_110 + w_111*v_111;
     return ret_val;
 }
 

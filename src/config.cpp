@@ -1,4 +1,5 @@
 #include <ostream>
+#include <fstream>
 #include <stdexcept>
 #include <functional>
 
@@ -7,7 +8,12 @@
 
 // static
 PIC::Config::Parameters PIC::Config::params = Config::Parameters();
-std::ofstream PIC::Config::ofs_log = std::ofstream("opic_trace.log");
+
+namespace {
+static std::ofstream out("opic_trace.log");
+}
+
+std::ofstream& PIC::Config::ofs_log = out;
 
 namespace
 {
@@ -180,12 +186,20 @@ bool PIC::Config::is_on_save_step()
 
 void PIC::Config::set_os_name()
 {
-#if defined (WIN32)
-   params.os_name = "Windows32";
-#elif defined(__linux__)
-  params.os_name = "Linux";
+#ifdef _WIN32
+	params.os_name = "Windows 32-bit";
+#elif _WIN64
+	params.os_name = "Windows 64-bit";
+#elif __unix || __unix__
+	params.os_name = "Unix";
+#elif __APPLE__ || __MACH__
+	params.os_name = "Mac OSX";
+#elif __linux__
+	params.os_name = "Linux";
+#elif __FreeBSD__
+	params.os_name = "FreeBSD";
 #else
-  params.os_name = "Unknown";
+	params.os_name = "Unknown";
 #endif
 }
 
@@ -222,7 +236,7 @@ namespace PIC
                (params.particle_push_alg == Boris  ? "Boris"  : "Undefined"))
         << "\ngrid threshold type = "
                << (params.grid_threshold == Min_Density ? "Min_Density" :
-               (params.grid_threshold == Local_CFL  ? "Local_CFL"  : "Undefined"))
+                  (params.grid_threshold == Local_CFL  ? "Local_CFL"  : "Undefined"))
          << "\nCFL_severity = " << params.CFL_severity
          << "\nConstants:"
          << "\nc = " << Constants::c()

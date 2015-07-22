@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <ostream>
+#include <cmath>
 
 
 template <class T>
