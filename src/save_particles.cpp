@@ -50,10 +50,10 @@ namespace
             (point_val.E.x/E), (point_val.E.y/E), (point_val.E.z/E));
    }
 
-   const char* theHeader = "X\tY\tZ"
-                           "\tV\tVx\tVy\tVz"
-                           "\tB\tBx\tBy\tBz"
-                           "\tE\tEx\tEy\tEz\n";
+   const char* the_header = "X\tY\tZ"
+                            "\tV\tVx\tVy\tVz"
+                            "\tB\tBx\tBy\tBz"
+                            "\tE\tEx\tEy\tEz\n";
 
    void save_particles_group(const Grid& grid,
                              const Particles& particles,
@@ -115,7 +115,7 @@ void save_particles(const Grid& grid, const Particles& particles)
       }
       else
       {
-         fprintf(fout, theHeader);
+         fprintf(fout, the_header);
 
          for (index_t i = 0; i != vec_idx.size(); ++i)
          {

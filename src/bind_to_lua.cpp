@@ -280,7 +280,7 @@ bool bind_to_lua(const char* lua_cfg_file_name,
 
       int lua_status = luaL_dofile(lua, lua_cfg_file_name);
       if (lua_status != 0)
-      	luabindErrorHandler(lua);
+      	luabind_error_handler(lua);
 
       lua_status_msg(lua_status, lua_cfg_file_name);
 
