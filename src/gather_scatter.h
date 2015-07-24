@@ -20,8 +20,7 @@ Bx, By, Bz are defined at [FHH], [HFH], [HHF]. Edge centered
 #include "particles.h"
 
 
-namespace PIC
-{
+namespace PIC {
 
 /***************************************************************************
 * 1D particle form-factor                                                  *
@@ -93,72 +92,72 @@ void from_grid_to_point(const Grid& grid,
 
 struct FaceXCentering
 {
-   static double x() { return 0.0; }
-   static double y() { return 0.5; }
-   static double z() { return 0.5; }
+    static double x() { return 0.0; }
+    static double y() { return 0.5; }
+    static double z() { return 0.5; }
 };
 
 struct FaceYCentering
 {
-   static double x() { return 0.5; }
-   static double y() { return 0.0; }
-   static double z() { return 0.5; }
+    static double x() { return 0.5; }
+    static double y() { return 0.0; }
+    static double z() { return 0.5; }
 };
 
 struct FaceZCentering
 {
-   static double x() { return 0.5; }
-   static double y() { return 0.5; }
-   static double z() { return 0.0; }
+    static double x() { return 0.5; }
+    static double y() { return 0.5; }
+    static double z() { return 0.0; }
 };
 
 struct EdgeXCentering
 {
-   static double x() { return 0.5; }
-   static double y() { return 0.0; }
-   static double z() { return 0.0; }
+    static double x() { return 0.5; }
+    static double y() { return 0.0; }
+    static double z() { return 0.0; }
 };
 
 struct EdgeYCentering
 {
-   static double x() { return 0.0; }
-   static double y() { return 0.5; }
-   static double z() { return 0.0; }
+    static double x() { return 0.0; }
+    static double y() { return 0.5; }
+    static double z() { return 0.0; }
 };
 
 struct EdgeZCentering
 {
-   static double x() { return 0.0; }
-   static double y() { return 0.0; }
-   static double z() { return 0.5; }
+    static double x() { return 0.0; }
+    static double y() { return 0.0; }
+    static double z() { return 0.5; }
 };
 
 struct CellCentering
 {
-   static double x() { return 0.5; }
-   static double y() { return 0.5; }
-   static double z() { return 0.5; }
+    static double x() { return 0.5; }
+    static double y() { return 0.5; }
+    static double z() { return 0.5; }
 };
 
 struct NodeCentering
 {
-   static double x() { return 0.0; }
-   static double y() { return 0.0; }
-   static double z() { return 0.0; }
+    static double x() { return 0.0; }
+    static double y() { return 0.0; }
+    static double z() { return 0.0; }
 };
 
 struct Density
 {
-   Density() : UP(0.0, 0.0, 0.0), NP(0.0) { }
-   DblVector UP; // ion velocity
-   double NP; // ion charge density
+    Density() : UP(0.0, 0.0, 0.0), NP(0.0) { }
+    DblVector UP; // ion velocity
+    double NP; // ion charge density
 };
 
 template<class Centering, class GridT>
 double gather_vector(const GridT& grid,
-                       const DblVector& atPoint,
-                       DblVector GridT::NodeType::* vec,
-                       double DblVector::* comp)
+                     const DblVector& atPoint,
+                     DblVector GridT::NodeType::* vec,
+                     double DblVector::* comp)
 {
     const double h = grid.step();
 
@@ -192,9 +191,9 @@ double gather_vector(const GridT& grid,
 
 template<class GridT>
 void gather_face(const GridT& grid,
-                   const DblVector& atPoint,
-                   DblVector GridT::NodeType::* val,
-                   DblVector& ret_vec)
+                 const DblVector& atPoint,
+                 DblVector GridT::NodeType::* val,
+                 DblVector& ret_vec)
 {
     ret_vec.x = gather_vector<PIC::FaceXCentering>(grid, atPoint, val, &DblVector::x);
     ret_vec.y = gather_vector<PIC::FaceYCentering>(grid, atPoint, val, &DblVector::y);

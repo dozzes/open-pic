@@ -6,17 +6,17 @@
 
 struct UseLua
 {
-   operator lua_State*() { return luaState_.lua_; }
+    operator lua_State*() { return luaState_.lua_; }
 
 private:
-   struct LuaState
-   {
-      LuaState();
-     ~LuaState();
-      lua_State* lua_;
-   };
+    struct LuaState
+    {
+        LuaState();
+        ~LuaState();
+        lua_State* lua_;
+    };
 
-   static LuaState luaState_;
+    static LuaState luaState_;
 };
 
 #endif // USE_LUA_H

@@ -10,43 +10,43 @@
 
 bool call_lua_function(const char* func_name)
 {
-   UseLua lua;
+    UseLua lua;
 
-   bool ok = true;
-   
-   try
-   {
-      luabind::call_function<void>(lua, func_name);
-   }
-   catch (std::exception& /*e*/)
-   {
-      std::string msg_fmt = "Function \"%s\" not defined or invalid in \"%s\".";
-      std::string msg = str(boost::format(msg_fmt) % func_name
-                                                   % PIC::Config::cfg_script_name());
-      print(msg);
-      ok = false;
-   }
+    bool ok = true;
 
-   return ok;
+    try
+    {
+        luabind::call_function<void>(lua, func_name);
+    }
+    catch (std::exception& /*e*/)
+    {
+        std::string msg_fmt = "Function \"%s\" not defined or invalid in \"%s\".";
+        std::string msg = str(boost::format(msg_fmt) % func_name
+            % PIC::Config::cfg_script_name());
+        print(msg);
+        ok = false;
+    }
+
+    return ok;
 }
 
 bool lua_validate_particle(Particle& particle)
 {
-   UseLua lua;
+    UseLua lua;
 
-   bool ok = true;
-  
-   try
-   {
-      ok = luabind::call_function<bool>(lua, "validate_particle", particle);
-   }
-   catch (std::exception& /*e*/)
-   {
-      std::string msg_fmt = "Function <validate_particle()> not defined or invalid in \"%s\".";
-      std::string msg = str(boost::format(msg_fmt) % PIC::Config::cfg_script_name());
-      print(msg);
-      ok = false;
-   }
+    bool ok = true;
 
-   return ok;
+    try
+    {
+        ok = luabind::call_function<bool>(lua, "validate_particle", particle);
+    }
+    catch (std::exception& /*e*/)
+    {
+        std::string msg_fmt = "Function <validate_particle()> not defined or invalid in \"%s\".";
+        std::string msg = str(boost::format(msg_fmt) % PIC::Config::cfg_script_name());
+        print(msg);
+        ok = false;
+    }
+
+    return ok;
 }

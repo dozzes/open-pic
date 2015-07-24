@@ -10,69 +10,69 @@
 PIC::Config::Parameters PIC::Config::params = Config::Parameters();
 
 namespace {
-static std::ofstream out("opic_trace.log");
+    static std::ofstream out("opic_trace.log");
 }
 
 std::ofstream& PIC::Config::ofs_log = out;
 
 namespace
 {
-   void check_if_positive(const std::string& msg, double val)
-   {
-      if (val < 0.0)
-      {
-         throw std::invalid_argument(msg);
-      }
-   }
+    void check_if_positive(const std::string& msg, double val)
+    {
+        if (val < 0.0)
+        {
+            throw std::invalid_argument(msg);
+        }
+    }
 }
 
 
 void PIC::Config::set_dens_cutoff(double dens_cutoff)
 {
-   check_if_positive("min NP must be > 0.0.", dens_cutoff);
-   params.dens_cutoff = dens_cutoff;
+    check_if_positive("min NP must be > 0.0.", dens_cutoff);
+    params.dens_cutoff = dens_cutoff;
 }
 
 void PIC::Config::set_tau(double tau)
 {
-   check_if_positive("tau must be > 0.0.", tau);
-   params.tau = tau;
+    check_if_positive("tau must be > 0.0.", tau);
+    params.tau = tau;
 }
 
 void PIC::Config::set_L_scale(double L_scale)
 {
-   check_if_positive("L_scale must be > 0.0.", L_scale);
-   params.L_scale = L_scale;
+    check_if_positive("L_scale must be > 0.0.", L_scale);
+    params.L_scale = L_scale;
 }
 
 void PIC::Config::set_T_scale(double T_scale)
 {
-   check_if_positive("T_scale must be > 0.0.", T_scale);
-   params.T_scale = T_scale;
+    check_if_positive("T_scale must be > 0.0.", T_scale);
+    params.T_scale = T_scale;
 }
 
 void PIC::Config::set_U_scale(double U_scale)
 {
-   check_if_positive("U_scale must be > 0.0.", U_scale);
-   params.U_scale = U_scale;
+    check_if_positive("U_scale must be > 0.0.", U_scale);
+    params.U_scale = U_scale;
 }
 
 void PIC::Config::set_N_scale(double N_scale)
 {
-   check_if_positive("N_scale must be > 0.0.", N_scale);
-   params.N_scale = N_scale;
+    check_if_positive("N_scale must be > 0.0.", N_scale);
+    params.N_scale = N_scale;
 }
 
 void PIC::Config::set_E_scale(double E_scale)
 {
-   check_if_positive("E_scale must be > 0.0.", E_scale);
-   params.E_scale = E_scale;
+    check_if_positive("E_scale must be > 0.0.", E_scale);
+    params.E_scale = E_scale;
 }
 
 void PIC::Config::set_B_scale(double B_scale)
 {
-   check_if_positive("B_scale must be > 0.0.", B_scale);
-   params.B_scale = B_scale;
+    check_if_positive("B_scale must be > 0.0.", B_scale);
+    params.B_scale = B_scale;
 }
 
 // static
@@ -83,59 +83,57 @@ void PIC::Config::to_stream(std::ostream& os)
 
 PIC::Config::Parameters::Parameters()
 : cfg_script_name(),
-  h(0.0),
-  tau(0.0),
-  dens_cutoff(0.0),
-  time_steps(0), save_time_steps(0),
-  grid_size_x(0), grid_size_y(0), grid_size_z(0),
-  total_particles_num(0),
-  save_all_particles(false),
-  save_whole_grid(false),
-  save_grid_x_plains(false),
-  save_grid_y_plains(false),
-  save_grid_z_plains(false),
-  os_name(""),
-  process_num(1),
-  process_rank(0),
-  current_time_step(0),
-  L_scale(1.0),
-  T_scale(1.0),
-  U_scale(1.0),
-  N_scale(1.0),
-  E_scale(1.0),
-  B_scale(1.0),
-  particle_push_alg(Direct),
-  grid_threshold(Min_Density),
-  CFL_severity(Stop)
+h(0.0),
+tau(0.0),
+dens_cutoff(0.0),
+time_steps(0), save_time_steps(0),
+grid_size_x(0), grid_size_y(0), grid_size_z(0),
+total_particles_num(0),
+save_all_particles(false),
+save_whole_grid(false),
+save_grid_x_plains(false),
+save_grid_y_plains(false),
+save_grid_z_plains(false),
+os_name(""),
+process_num(1),
+process_rank(0),
+current_time_step(0),
+L_scale(1.0),
+T_scale(1.0),
+U_scale(1.0),
+N_scale(1.0),
+E_scale(1.0),
+B_scale(1.0),
+particle_push_alg(Direct),
+grid_threshold(Min_Density),
+CFL_severity(Stop)
 {
-	set_os_name();
+    set_os_name();
 }
 
 PIC::Config::Parameters::Parameters(const std::string& cfg_script_name_,
-                               double h_,
-                               double tau_,
-                               double dens_cutoff_,
-                               index_t time_steps_, index_t save_time_steps_,
-                               index_t grid_size_x_, index_t grid_size_y_, index_t grid_size_z_,
-                               index_t total_particles_num_,
-                               bool   save_all_particles_,
-                               bool   save_whole_grid_,
-                               bool   save_grid_x_plains_,
-                               bool   save_grid_y_plains_,
-                               bool   save_grid_z_plains_,
-                               const std::string& os_name_,
-                               index_t process_num_,
-                               index_t process_rank_,
-                               index_t current_time_step_,
-                               double L_scale_,
-                               double T_scale_,
-                               double U_scale_,
-                               double N_scale_,
-                               double E_scale_,
-                               double B_scale_,
-                               ParticlePushAlg particle_push_alg_,
-                               GridThreshold grid_threshold_,
-                               CFLSeverity CFL_severity_)
+                                    double h_,
+                                    double tau_,
+                                    double dens_cutoff_,
+                                    index_t time_steps_, index_t save_time_steps_,
+                                    index_t grid_size_x_, index_t grid_size_y_, index_t grid_size_z_,
+                                    index_t total_particles_num_,
+                                    bool save_all_particles_,
+                                    bool save_whole_grid_,
+                                    bool save_grid_x_plains_, bool save_grid_y_plains_, bool save_grid_z_plains_,
+                                    const std::string& os_name_,
+                                    index_t process_num_,
+                                    index_t process_rank_,
+                                    index_t current_time_step_,
+                                    double L_scale_,
+                                    double T_scale_,
+                                    double U_scale_,
+                                    double N_scale_,
+                                    double E_scale_,
+                                    double B_scale_,
+                                    ParticlePushAlg particle_push_alg_,
+                                    GridThreshold grid_threshold_,
+                                    CFLSeverity CFL_severity_)
 : cfg_script_name(cfg_script_name_),
   h(h_),
   tau(tau_),
@@ -167,85 +165,86 @@ PIC::Config::Parameters::Parameters(const std::string& cfg_script_name_,
 
 bool PIC::Config::Parameters::is_valid() const
 {
-   return (h > 0.0 && tau > 0.0 && dens_cutoff > 0.0 &&
-           time_steps > 0 && save_time_steps > 0 &&
-           grid_size_x > 0 && grid_size_y > 0 && grid_size_z > 0 &&
-           L_scale > 0.0 &&
-           T_scale > 0.0 &&
-           U_scale > 0.0 &&
-           N_scale > 0.0 &&
-           E_scale > 0.0 &&
-           B_scale > 0.0);
+    return (h > 0.0 && tau > 0.0 && dens_cutoff > 0.0 &&
+            time_steps > 0 && save_time_steps > 0 &&
+            grid_size_x > 0 && grid_size_y > 0 && grid_size_z > 0 &&
+            L_scale > 0.0 &&
+            T_scale > 0.0 &&
+            U_scale > 0.0 &&
+            N_scale > 0.0 &&
+            E_scale > 0.0 &&
+            B_scale > 0.0);
 }
 
 bool PIC::Config::is_on_save_step()
 {
-   return ((current_time_step() % save_time_steps() == 0) ||
-           (current_time_step() == time_steps()));
+    return ((current_time_step() % save_time_steps() == 0) || (current_time_step() == time_steps()));
 }
 
 void PIC::Config::set_os_name()
 {
 #ifdef _WIN32
-	params.os_name = "Windows 32-bit";
+    params.os_name = "Windows 32-bit";
 #elif _WIN64
-	params.os_name = "Windows 64-bit";
+    params.os_name = "Windows 64-bit";
 #elif __unix || __unix__
-	params.os_name = "Unix";
+    params.os_name = "Unix";
 #elif __APPLE__ || __MACH__
-	params.os_name = "Mac OSX";
+    params.os_name = "Mac OSX";
 #elif __linux__
-	params.os_name = "Linux";
+    params.os_name = "Linux";
 #elif __FreeBSD__
-	params.os_name = "FreeBSD";
+    params.os_name = "FreeBSD";
 #else
-	params.os_name = "Unknown";
+    params.os_name = "Unknown";
 #endif
 }
 
-namespace PIC
+namespace PIC {
+
+ostream& operator<<(ostream& os, const Config::Parameters& params)
 {
-   ostream& operator<<(ostream& os, const Config::Parameters& params)
-   {
-      os << "\nConfiguaration:"
-         << "\ncfg_script_name = " << params.cfg_script_name
-         << "\nh = " << params.h
-         << "\ntau = " <<  params.tau
-         << "\ndens_cutoff = " <<  params.dens_cutoff
-         << "\nL_scale = " << params.L_scale
-         << "\nT_scale = " << params.T_scale
-         << "\nU_scale = " << params.U_scale
-         << "\nN_scale = " << params.N_scale
-         << "\nE_scale = " << params.E_scale
-         << "\nB_scale = " << params.B_scale
-         << "\ntime steps number = " << params.time_steps
-         << "\nsave time steps number = " << params.save_time_steps
-         << "\ngrid size = " << params.grid_size_x << " x " << params.grid_size_y << " x " << params.grid_size_z
-         << "\ntotal particles number = " << params.total_particles_num
-         << boolalpha
-         << "\nsave all particles = " << params.save_all_particles
-         << "\nsave whole grid = " << params.save_whole_grid
-         << "\nsave grid X-plains = " << params.save_grid_x_plains
-         << "\nsave grid Y-plains = " << params.save_grid_y_plains
-         << "\nsave grid Z-plains = " << params.save_grid_z_plains
-         << "\nOS name = " << params.os_name
-         << "\nprocess_num = " << params.process_num
-         << "\nprocess_rank = " << params.process_rank
-         << "\nalgorithm of solving particle motion equation = "
-            << (params.particle_push_alg == Direct ? "Direct" :
-               (params.particle_push_alg == Boris  ? "Boris"  : "Undefined"))
-        << "\ngrid threshold type = "
-               << (params.grid_threshold == Min_Density ? "Min_Density" :
-                  (params.grid_threshold == Local_CFL  ? "Local_CFL"  : "Undefined"))
-         << "\nCFL_severity = " << params.CFL_severity
-         << "\nConstants:"
-         << "\nc = " << Constants::c()
-         << "\ne = " << Constants::e()
-         << "\nmp = " << Constants::mp()
-         << "\ne_mp = " << Constants::e_mp()
-         << "\npi = " << Constants::pi()
-         << "\nc_4pi_e = " << Constants::c_4pi_e()
-         << endl;
-      return os;
-   }
+    os << "\nConfiguaration:"
+       << "\ncfg_script_name = " << params.cfg_script_name
+       << "\nh = " << params.h
+       << "\ntau = " << params.tau
+       << "\ndens_cutoff = " << params.dens_cutoff
+       << "\nL_scale = " << params.L_scale
+       << "\nT_scale = " << params.T_scale
+       << "\nU_scale = " << params.U_scale
+       << "\nN_scale = " << params.N_scale
+       << "\nE_scale = " << params.E_scale
+       << "\nB_scale = " << params.B_scale
+       << "\ntime steps number = " << params.time_steps
+       << "\nsave time steps number = " << params.save_time_steps
+       << "\ngrid size = " << params.grid_size_x << " x " << params.grid_size_y << " x " << params.grid_size_z
+       << "\ntotal particles number = " << params.total_particles_num
+       << boolalpha
+       << "\nsave all particles = " << params.save_all_particles
+       << "\nsave whole grid = " << params.save_whole_grid
+       << "\nsave grid X-plains = " << params.save_grid_x_plains
+       << "\nsave grid Y-plains = " << params.save_grid_y_plains
+       << "\nsave grid Z-plains = " << params.save_grid_z_plains
+       << "\nOS name = " << params.os_name
+       << "\nprocess_num = " << params.process_num
+       << "\nprocess_rank = " << params.process_rank
+       << "\nalgorithm of solving particle motion equation = "
+       << (params.particle_push_alg == Direct ? "Direct" :
+       (params.particle_push_alg == Boris ? "Boris" : "Undefined"))
+       << "\ngrid threshold type = "
+       << (params.grid_threshold == Min_Density ? "Min_Density" :
+       (params.grid_threshold == Local_CFL ? "Local_CFL" : "Undefined"))
+       << "\nCFL_severity = " << params.CFL_severity
+       << "\nConstants:"
+       << "\nc = " << Constants::c()
+       << "\ne = " << Constants::e()
+       << "\nmp = " << Constants::mp()
+       << "\ne_mp = " << Constants::e_mp()
+       << "\npi = " << Constants::pi()
+       << "\nc_4pi_e = " << Constants::c_4pi_e()
+       << endl;
+
+    return os;
 }
+
+} // namespace PIC
