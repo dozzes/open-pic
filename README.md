@@ -1,4 +1,5 @@
 open-pic
 ========
 
-3d particle-in-cell 
+open-pic is a 3D particle-in-cell code fo collisionless plasma simulation.
+Depends on luabind and boost libraries.
