@@ -218,8 +218,8 @@ void move_particles_half_time(const Grid& grid,
 *                                  *
 ***********************************/
 void move_particles_full_time(const Grid& grid,
-    Particles& particles,
-    const std::string& group_name) // m+1
+                              Particles& particles,
+                              const std::string& group_name) // m+1
 {
     const double tau_2 = Config::tau_2();
 
@@ -366,22 +366,22 @@ void set_grid_UP(const Grid& grid, DensityGridType& dg_group)
     for (index_t j = m; j != (grid.size_y() - m); ++j)
     for (index_t k = m; k != (grid.size_z() - m); ++k)
     {
-        const CellState cell_state = grid(i, j, k).state();
+        const CellState cell_state = grid(i,j,k).state();
 
         if (cell_state == PIC::cs_active)
         {
-            typename DensityGridType::NodeType& dn = dg_group(i, j, k);
+            typename DensityGridType::NodeType& dn = dg_group(i,j,k);
 
             // NP for UPx
-            NP = 0.5 * (dn.NP + dg_group(i - 1, j, k).NP);
+            NP = 0.5 * (dn.NP + dg_group(i-1,j,k).NP);
             NP > 1.0e-6 ? dn.UP.x /= NP : dn.UP.x = 0.0;
 
             // NP for UPy
-            NP = 0.5 * (dn.NP + dg_group(i, j - 1, k).NP);
+            NP = 0.5 * (dn.NP + dg_group(i,j-1,k).NP);
             NP > 1.0e-6 ? dn.UP.y /= NP : dn.UP.y = 0.0;
 
             //NP for UEz
-            NP = 0.5 * (dn.NP + dg_group(i, j, k - 1).NP);
+            NP = 0.5 * (dn.NP + dg_group(i,j,k-1).NP);
             NP > 1.0e-6 ? dn.UP.z /= NP : dn.UP.z = 0.0;
         }
     }
@@ -396,18 +396,18 @@ void normalize_NP(const Grid& grid, DensityGridType& dg_group)
     for (index_t j = 0; j != grid.size_y(); ++j)
     for (index_t k = 0; k != grid.size_z(); ++k)
     {
-        const CellState cell_state = grid(i, j, k).state();
+        const CellState cell_state = grid(i,j,k).state();
 
         if (cell_state == cs_active)
         {
-            dg_group(i, j, k).NP /= cell_volume;
+            dg_group(i,j,k).NP /= cell_volume;
         }
     }
 }
 
 void local_Alfven_CFL(Grid& grid, size_t i, size_t j, size_t k)
 {
-    Cell& cell = grid(i, j, k);
+    Cell& cell = grid(i,j,k);
 
     const double h = grid.step();
     DblVector vec_to_point(i*h, j*h, k*h);
@@ -419,7 +419,7 @@ void local_Alfven_CFL(Grid& grid, size_t i, size_t j, size_t k)
     const double pi = Constants::pi();
     const double tau_2 = Config::tau_2();
 
-    const double min_dens = 1.5*B*B*tau_2*tau_2 / (4 * pi*h*h*mp);
+    const double min_dens =  1.5*B*B*tau_2*tau_2/(4*pi*h*h*mp);
     const double cell_volume = grid.cell_volume();
 
     // At this stage grid stores NP*cell_volume
@@ -437,17 +437,17 @@ void local_Alfven_CFL(Grid& grid, size_t i, size_t j, size_t k)
 
 void backgr_fracture(Grid& grid, size_t i, size_t j, size_t k)
 {
-    Cell& cell = grid(i, j, k);
+    Cell& cell = grid(i,j,k);
 
     const double dens_cutoff = PIC::Config::dens_cutoff();
     const double cell_volume = grid.cell_volume();
 
-    // At this stage grid stores NP*cell_volume
+     // At this stage grid stores NP*cell_volume
     if (cell.NP < dens_cutoff*cell_volume)
     {
         PIC::Config::logger() << "\nbackgr_fracture:"
                               << "(i,j,k) = (" << i << "," << j << "," << k << ")"
-                              << " cell.NP = " << cell.NP / grid.cell_volume()
+                              << " cell.NP = " << cell.NP/grid.cell_volume()
                               << " dens_cutoff = " << dens_cutoff
                               << std::endl;
 
@@ -464,7 +464,7 @@ void set_threshold(Grid& grid)
     for (index_t j = 1; j != grid.size_y()-1; ++j)
     for (index_t k = 1; k != grid.size_z()-1; ++k)
     {
-        const CellState cell_state = grid(i, j, k).state();
+        const CellState cell_state = grid(i,j,k).state();
 
         if (cell_state == PIC::cs_active)
         {

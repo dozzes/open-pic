@@ -10,21 +10,21 @@
 PIC::Config::Parameters PIC::Config::params = Config::Parameters();
 
 namespace {
-    static std::ofstream out("opic_trace.log");
-}
 
-std::ofstream& PIC::Config::ofs_log = out;
+static std::ofstream out("opic_trace.log");
 
-namespace
+void check_if_positive(const std::string& msg, double val)
 {
-    void check_if_positive(const std::string& msg, double val)
+    if (val < 0.0)
     {
-        if (val < 0.0)
-        {
-            throw std::invalid_argument(msg);
-        }
+        throw std::invalid_argument(msg);
     }
 }
+
+} // unnamed namespace
+
+// static
+std::ofstream& PIC::Config::ofs_log = out;
 
 
 void PIC::Config::set_dens_cutoff(double dens_cutoff)
@@ -83,30 +83,30 @@ void PIC::Config::to_stream(std::ostream& os)
 
 PIC::Config::Parameters::Parameters()
 : cfg_script_name(),
-h(0.0),
-tau(0.0),
-dens_cutoff(0.0),
-time_steps(0), save_time_steps(0),
-grid_size_x(0), grid_size_y(0), grid_size_z(0),
-total_particles_num(0),
-save_all_particles(false),
-save_whole_grid(false),
-save_grid_x_plains(false),
-save_grid_y_plains(false),
-save_grid_z_plains(false),
-os_name(""),
-process_num(1),
-process_rank(0),
-current_time_step(0),
-L_scale(1.0),
-T_scale(1.0),
-U_scale(1.0),
-N_scale(1.0),
-E_scale(1.0),
-B_scale(1.0),
-particle_push_alg(Direct),
-grid_threshold(Min_Density),
-CFL_severity(Stop)
+  h(0.0),
+  tau(0.0),
+  dens_cutoff(0.0),
+  time_steps(0), save_time_steps(0),
+  grid_size_x(0), grid_size_y(0), grid_size_z(0),
+  total_particles_num(0),
+  save_all_particles(false),
+  save_whole_grid(false),
+  save_grid_x_plains(false),
+  save_grid_y_plains(false),
+  save_grid_z_plains(false),
+  os_name(""),
+  process_num(1),
+  process_rank(0),
+  current_time_step(0),
+  L_scale(1.0),
+  T_scale(1.0),
+  U_scale(1.0),
+  N_scale(1.0),
+  E_scale(1.0),
+  B_scale(1.0),
+  particle_push_alg(Direct),
+  grid_threshold(Min_Density),
+  CFL_severity(Stop)
 {
     set_os_name();
 }
@@ -178,7 +178,8 @@ bool PIC::Config::Parameters::is_valid() const
 
 bool PIC::Config::is_on_save_step()
 {
-    return ((current_time_step() % save_time_steps() == 0) || (current_time_step() == time_steps()));
+    return ((current_time_step() % save_time_steps() == 0) ||
+            (current_time_step() == time_steps()));
 }
 
 void PIC::Config::set_os_name()
@@ -230,10 +231,10 @@ ostream& operator<<(ostream& os, const Config::Parameters& params)
        << "\nprocess_rank = " << params.process_rank
        << "\nalgorithm of solving particle motion equation = "
        << (params.particle_push_alg == Direct ? "Direct" :
-       (params.particle_push_alg == Boris ? "Boris" : "Undefined"))
+          (params.particle_push_alg == Boris ? "Boris" : "Undefined"))
        << "\ngrid threshold type = "
        << (params.grid_threshold == Min_Density ? "Min_Density" :
-       (params.grid_threshold == Local_CFL ? "Local_CFL" : "Undefined"))
+          (params.grid_threshold == Local_CFL ? "Local_CFL" : "Undefined"))
        << "\nCFL_severity = " << params.CFL_severity
        << "\nConstants:"
        << "\nc = " << Constants::c()

@@ -21,8 +21,7 @@ bool call_lua_function(const char* func_name)
     catch (std::exception& /*e*/)
     {
         std::string msg_fmt = "Function \"%s\" not defined or invalid in \"%s\".";
-        std::string msg = str(boost::format(msg_fmt) % func_name
-            % PIC::Config::cfg_script_name());
+        std::string msg = str(boost::format(msg_fmt) % func_name % PIC::Config::cfg_script_name());
         print(msg);
         ok = false;
     }

@@ -13,50 +13,50 @@
 #include "check_particle.h"
 
 
-namespace
-{
-    /*********************************************************
-    * check if particle is active.                           *
-    * equation of motion is solved for active particles only *
-    * return true if particles is active, otherwise - false  *
-    *********************************************************/
-    bool is_particle_active(Particle& particle, const Grid& grid)
-    {
-        if (particle.is_absorbed)
-            return false;
+namespace {
 
-        const double h = grid.step();
+ /*********************************************************
+ * check if particle is active.                           *
+ * equation of motion is solved for active particles only *
+ * return true if particles is active, otherwise - false  *
+ *********************************************************/
+ bool is_particle_active(Particle& particle, const Grid& grid)
+ {
+     if (particle.is_absorbed)
+         return false;
 
-        const index_t pkx = static_cast<index_t>(floor(particle.r.x / h));
-        const index_t pky = static_cast<index_t>(floor(particle.r.y / h));
-        const index_t pkz = static_cast<index_t>(floor(particle.r.z / h));
+     const double h = grid.step();
 
-        if (pkx < 1 || pkx > grid.size_x() - 2 ||
-            pky < 1 || pky > grid.size_y() - 2 ||
-            pkz < 1 || pkz > grid.size_z() - 2)
-        {
-            return false;
-        }
+     const index_t pi = static_cast<index_t>(floor(particle.r.x/h));
+     const index_t pj = static_cast<index_t>(floor(particle.r.y/h));
+     const index_t pk = static_cast<index_t>(floor(particle.r.z/h));
 
-        PIC::CellState home_cell_state = grid(pkx, pky, pkz).state();
+     if (pi < 1 || pi > grid.size_x() - 2 ||
+         pj < 1 || pj > grid.size_y() - 2 ||
+         pk < 1 || pk > grid.size_z() - 2)
+     {
+         return false;
+     }
 
-        if (home_cell_state == PIC::cs_active)
-        {
-            return true;
-        }
+     PIC::CellState home_cell_state = grid(pi,pj,pk).state();
 
-        if (home_cell_state == PIC::cs_absorptive)
-        {
-            return false;
-        }
+     if (home_cell_state == PIC::cs_active)
+     {
+         return true;
+     }
 
-        if (home_cell_state == PIC::cs_custom)
-        {
-            return lua_validate_particle(particle);
-        }
+     if (home_cell_state == PIC::cs_absorptive)
+     {
+         return false;
+     }
 
-        return true;
-    }
+     if (home_cell_state == PIC::cs_custom)
+     {
+         return lua_validate_particle(particle);
+     }
+
+     return true;
+ }
 
 } // anonymous namespace
 
@@ -82,9 +82,9 @@ bool check_particle_move(Particle& particle, const Grid& grid, const DblVector& 
         Grid::NodeType point_val;
         PIC::from_grid_to_point(grid, particle.r, point_val);
 
-        const index_t pi = static_cast<size_t>(particle.r.x / h);
-        const index_t pj = static_cast<size_t>(particle.r.y / h);
-        const index_t pk = static_cast<size_t>(particle.r.z / h);
+        const index_t pi = static_cast<size_t>(particle.r.x/h);
+        const index_t pj = static_cast<size_t>(particle.r.y/h);
+        const index_t pk = static_cast<size_t>(particle.r.z/h);
 
         const std::string msg = str(boost::format("Step = %1%:\n\tError CFL:"
                                                   "\n\tparticle's home cell = (%2%, %3%, %4%);"

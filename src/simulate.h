@@ -6,8 +6,7 @@
 #include "opic_fwd.h"
 
 
-namespace PIC
-{
+namespace PIC {
 
 /************************************************************
 *                                                           *

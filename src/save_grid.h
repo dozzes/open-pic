@@ -25,12 +25,14 @@ void save_subgrid(const GridT& grid, const DensGridT& dens_grid, const PointFilt
         return;
     }
 
-    fprintf(fout, "X\tY\tZ"
-        "\tNP"
-        "\tB\tBx\tBy\tBz"
-        "\tE\tEx\tEy\tEz\tdiv(E)"
-        "\tUP\tUPx\tUPy\tUPz\tMa"
-        "\tUE\tUEx\tUEy\tUEz\n");
+    const char* the_header = "X\tY\tZ"
+                             "\tNP"
+                             "\tB\tBx\tBy\tBz"
+                             "\tE\tEx\tEy\tEz\tdiv(E)"
+                             "\tUP\tUPx\tUPy\tUPz\tMa"
+                             "\tUE\tUEx\tUEy\tUEz\n";
+
+    fputs(the_header,  fout);
 
     const double h = grid.step();
 
@@ -73,30 +75,30 @@ void save_subgrid(const GridT& grid, const DensGridT& dens_grid, const PointFilt
             const double divE = (L / E)*((Ex_r - Ex_l) + (Ey_r - Ey_l) + (Ez_r - Ez_l)) / h;
 
             fprintf(fout,
-                   "%e\t%e\t%e\t" /* point.x/L, point.y/L, point.z/L */
-                   "%e\t" /* dgNode.NP/N */
-                   "%e\t" /* point_val.B.abs()/B */
-                   "%e\t%e\t%e\t" /* point_val.B.x/B, point_val.B.y/B, point_val.B.z/B */
-                   "%e\t" /* point_val.E.abs()/E */
-                   "%e\t%e\t%e\t" /* point_val.E.x/E, point_val.E.y/E, point_val.E.z/E */
-                   "%e\t" /* div(E)/(E/L) */
-                   "%e\t" /* dgNode.UP.abs()/U */
-                   "%e\t%e\t%e\t" /* dgNode.UP.x/U, dgNode.UP.y/U, dgNode.UP.z/U */
-                   "%e\t" /* dgNode.UP.abs()/vA */
-                   "%e\t" /* point_val.UE.abs()/U */
-                   "%e\t%e\t%e\n", /* dpoint_val.UE.x/U, point_val.UE.y/U, point_val.UE.z/U */
-                   (point.x / L), (point.y / L), (point.z / L),
-                   (dgNode.NP / N),
-                   (point_val.B.abs() / B),
-                   (point_val.B.x / B), (point_val.B.y / B), (point_val.B.z / B),
-                   (point_val.E.abs() / E),
-                   (point_val.E.x / E), (point_val.E.y / E), (point_val.E.z / E),
-                   divE,
-                   (dgNode.UP.abs() / U),
-                   (dgNode.UP.x / U), (dgNode.UP.y / U), (dgNode.UP.z / U),
-                   (dgNode.UP.abs() / vA),
-                   (point_val.UE.abs() / U),
-                   (point_val.UE.x / U), (point_val.UE.y / U), (point_val.UE.z / U));
+                    "%e\t%e\t%e\t" /* point.x/L, point.y/L, point.z/L */
+                    "%e\t" /* dgNode.NP/N */
+                    "%e\t" /* point_val.B.abs()/B */
+                    "%e\t%e\t%e\t" /* point_val.B.x/B, point_val.B.y/B, point_val.B.z/B */
+                    "%e\t" /* point_val.E.abs()/E */
+                    "%e\t%e\t%e\t" /* point_val.E.x/E, point_val.E.y/E, point_val.E.z/E */
+                    "%e\t" /* div(E)/(E/L) */
+                    "%e\t" /* dgNode.UP.abs()/U */
+                    "%e\t%e\t%e\t" /* dgNode.UP.x/U, dgNode.UP.y/U, dgNode.UP.z/U */
+                    "%e\t" /* dgNode.UP.abs()/vA */
+                    "%e\t" /* point_val.UE.abs()/U */
+                    "%e\t%e\t%e\n", /* dpoint_val.UE.x/U, point_val.UE.y/U, point_val.UE.z/U */
+                    (point.x / L), (point.y / L), (point.z / L),
+                    (dgNode.NP / N),
+                    (point_val.B.abs() / B),
+                    (point_val.B.x / B), (point_val.B.y / B), (point_val.B.z / B),
+                    (point_val.E.abs() / E),
+                    (point_val.E.x / E), (point_val.E.y / E), (point_val.E.z / E),
+                    divE,
+                    (dgNode.UP.abs() / U),
+                    (dgNode.UP.x / U), (dgNode.UP.y / U), (dgNode.UP.z / U),
+                    (dgNode.UP.abs() / vA),
+                    (point_val.UE.abs() / U),
+                    (point_val.UE.x / U), (point_val.UE.y / U), (point_val.UE.z / U));
         }
     }
 

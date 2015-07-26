@@ -79,7 +79,6 @@ class Particles
     typedef std::deque<Particle> ParticlesContainer;
 
 public:
-
     index_t size() const;
     void resize(index_t new_size);
 

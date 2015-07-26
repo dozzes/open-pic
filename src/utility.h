@@ -18,7 +18,7 @@ typedef Vector3D<double> DblVector;
 
 void rnd_ball(double R, DblVector& result)
 {
-    double r = R * pow(rnd(), 1.0 / 3.0);
+    double r = R * pow(rnd(), 1.0/3.0);
     double t = acos(2.0 * rnd() - 1);
     double f = 2.0 * PIC::Constants::pi() * rnd();
 
