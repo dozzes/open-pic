@@ -146,9 +146,7 @@ public:
             NodeT& node = this->data_[i];
 
             node.NP += dg_node.NP;
-            node.UP.x += dg_node.UP.x;
-            node.UP.y += dg_node.UP.y;
-            node.UP.z += dg_node.UP.z;
+            node.UP += dg_node.UP;
         }
     }
 

@@ -172,7 +172,7 @@ void move_particles_half_time(const Grid& grid,
         {
             Particle& particle = particles[p];
 
-            if ((group_name == "all" || particle.group_name == group_name) &&
+            if ((group_name == ParticleGroups::all_particles_name || particle.group_name == group_name) &&
                 validate_particle(particle, grid) &&
                 (err_count == 0))
             {
@@ -182,9 +182,7 @@ void move_particles_half_time(const Grid& grid,
 
                 if (check_particle_move(particle, grid, dr))
                 {
-                    particle.r.x += dr.x;
-                    particle.r.y += dr.y;
-                    particle.r.z += dr.z;
+                    particle.r += dr;
 
                     if (validate_particle(particle, grid))
                     {
@@ -230,12 +228,10 @@ void move_particles_full_time(const Grid& grid,
     {
         Particle& particle = particles[p];
 
-        if ((group_name == "all" || particle.group_name == group_name) &&
+        if ((group_name == ParticleGroups::all_particles_name || particle.group_name == group_name) &&
             validate_particle(particle, grid))
         {
-            particle.r.x += tau_2 * particle.v.x;
-            particle.r.y += tau_2 * particle.v.y;
-            particle.r.z += tau_2 * particle.v.z;
+            particle.r += tau_2*particle.v;
         }
     }
 }
@@ -604,8 +600,8 @@ void simulate(Grid& grid, Particles& particles)
             call_lua_function("on_particles_moved_half_time");
 
             // move all particle on half time step.
-            print_tm("Move particles in half time step: ", "all");
-            move_particles_half_time(grid, particles, "all");
+            print_tm("Move particles in half time step: ", ParticleGroups::all_particles_name);
+            move_particles_half_time(grid, particles, ParticleGroups::all_particles_name);
 
             // accumulate all particles charge and current densities
             // scattered in particles push threads.
@@ -633,15 +629,15 @@ void simulate(Grid& grid, Particles& particles)
             print_tm("Save particles data");
             save_particles(grid, particles);
 
-            print_tm("Save grid data: ", "all");
-            save_grid(grid, grid, "all");
+            print_tm("Save grid data: ", ParticleGroups::all_particles_name);
+            save_grid(grid, grid, ParticleGroups::all_particles_name);
 
-            //save_grid_node_data("all", grid);
+            //save_grid_node_data(ParticleGroups::all_particles_name, grid);
         }
 
         // move all particle on full time step
-        print_tm("Move particles in full time step: ", "all");
-        move_particles_full_time(grid, particles, "all");
+        print_tm("Move particles in full time step: ", ParticleGroups::all_particles_name);
+        move_particles_full_time(grid, particles, ParticleGroups::all_particles_name);
 
         print_tm("Call \"particles moved on full time\" handler");
         call_lua_function("on_particles_moved_full_time");

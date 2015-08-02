@@ -86,7 +86,7 @@ bool check_particle_move(Particle& particle, const Grid& grid, const DblVector& 
         const index_t pj = static_cast<size_t>(particle.r.y/h);
         const index_t pk = static_cast<size_t>(particle.r.z/h);
 
-        const std::string msg = str(boost::format("Step = %1%:\n\tError CFL:"
+        const std::string msg = boost::str(boost::format("Step = %1%:\n\tError CFL:"
                                                   "\n\tparticle's home cell = (%2%, %3%, %4%);"
                                                   "\n\tdr = (%5%, %6%, %7%),\n\tdr.abs() = %8%; h = %9%;"
                                                   "\n\tparticle [%10%] at (%11%, %12%, %13%)"

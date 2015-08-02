@@ -41,39 +41,39 @@ typedef double (DblVector::*VectorComp);
 
 /*****************************************************************************
 * Gather edge-centered values.                                               *
-*    x, y, z - specified position                                            *
+*    at_point - specified position                                           *
 *    val_x, val_y, val_z - Cell required values                              *
 *    ret_vec - result gathered value                                         *
 * Used to interpolate Bx, By, Bz for specified position                      *
 *****************************************************************************/
 void gather_edge(const Grid& grid,
-                 const DblVector& atPoint,
+                 const DblVector& at_point,
                  CellVectorValue val,
                  DblVector& ret_vec);
 
 /*****************************************************************************
 * Gather face-centered values: Ex, Ey, Ez, UPx, UPy, UPz, UEx, UEy, UEz      *
-*    x, y, z - specified position                                            *
+*    at_point - specified position                                           *
 *    val_x, val_y, val_z - Pointers to cell members required                 *
 *    ret_vec - result gathered value                                         *
 * Used to interpolate Ex, Ey, Ez, UPx, UPy, UPz, UEx, UEy, UEz values        *
 * for specified position.                                                    *
 *****************************************************************************/
 void gather_face(const Grid& grid,
-                 const DblVector& atPoint,
+                 const DblVector& at_point,
                  CellVectorValue val,
                  DblVector& ret_vec);
 
 /*****************************************************************************
 * Gather cell-centered value.                                                *
-*   x, y, z - specified position                                             *
+*   at_point - specified position                                            *
 *   val - Pointer to cell member required                                    *
 *   ret_val - result gathered value                                          *
 * Used to interpolate density NP values for specified position.              *
 *                                                                            *
 *****************************************************************************/
 double gather_center(const Grid& grid,
-                     const DblVector& atPoint,
+                     const DblVector& at_point,
                      CellScalarValue val);
 
 /***************************************************************************
@@ -155,16 +155,16 @@ struct Density
 
 template<class Centering, class GridT>
 double gather_vector(const GridT& grid,
-                     const DblVector& atPoint,
+                     const DblVector& at_point,
                      DblVector GridT::NodeType::* vec,
                      double DblVector::* comp)
 {
     const double h = grid.step();
 
     // home cell node indexes
-    const index_t pi = static_cast<index_t>(atPoint.x/h - Centering::x());
-    const index_t pj = static_cast<index_t>(atPoint.y/h - Centering::y());
-    const index_t pk = static_cast<index_t>(atPoint.z/h - Centering::z());
+    const index_t pi = static_cast<index_t>(at_point.x/h - Centering::x());
+    const index_t pj = static_cast<index_t>(at_point.y/h - Centering::y());
+    const index_t pk = static_cast<index_t>(at_point.z/h - Centering::z());
 
     double ret_val = 0.0;
 
@@ -172,9 +172,9 @@ double gather_vector(const GridT& grid,
     for (size_t j = pj; j != pj+2; ++j)
     for (size_t k = pk; k != pk+2; ++k)
     {
-       ret_val += (grid(i,j,k).*vec.*comp) * R((i + Centering::x())*h - atPoint.x,
-                                               (j + Centering::y())*h - atPoint.y,
-                                               (k + Centering::z())*h - atPoint.z, h);
+        ret_val += (grid(i,j,k).*vec.*comp) * R((i + Centering::x())*h - at_point.x,
+                                                (j + Centering::y())*h - at_point.y,
+                                                (k + Centering::z())*h - at_point.z, h);
     }
 
     return ret_val;
@@ -191,26 +191,26 @@ double gather_vector(const GridT& grid,
 
 template<class GridT>
 void gather_face(const GridT& grid,
-                 const DblVector& atPoint,
+                 const DblVector& at_point,
                  DblVector GridT::NodeType::* val,
                  DblVector& ret_vec)
 {
-    ret_vec.x = gather_vector<PIC::FaceXCentering>(grid, atPoint, val, &DblVector::x);
-    ret_vec.y = gather_vector<PIC::FaceYCentering>(grid, atPoint, val, &DblVector::y);
-    ret_vec.z = gather_vector<PIC::FaceZCentering>(grid, atPoint, val, &DblVector::z);
+    ret_vec.x = gather_vector<PIC::FaceXCentering>(grid, at_point, val, &DblVector::x);
+    ret_vec.y = gather_vector<PIC::FaceYCentering>(grid, at_point, val, &DblVector::y);
+    ret_vec.z = gather_vector<PIC::FaceZCentering>(grid, at_point, val, &DblVector::z);
 }
 
 template<class Centering, class GridT>
 double gather_scalar(const GridT& grid,
-                     const DblVector& atPoint,
+                     const DblVector& at_point,
                      double GridT::NodeType::* val)
 {
     const double h = grid.step();
 
     // home cell node indexes
-    const index_t pi = static_cast<index_t>(atPoint.x/h - Centering::x());
-    const index_t pj = static_cast<index_t>(atPoint.y/h - Centering::y());
-    const index_t pk = static_cast<index_t>(atPoint.z/h - Centering::z());
+    const index_t pi = static_cast<index_t>(at_point.x/h - Centering::x());
+    const index_t pj = static_cast<index_t>(at_point.y/h - Centering::y());
+    const index_t pk = static_cast<index_t>(at_point.z/h - Centering::z());
 
     double ret_val = 0.0;
 
@@ -218,9 +218,9 @@ double gather_scalar(const GridT& grid,
     for (size_t j = pj; j != pj+2; ++j)
     for (size_t k = pk; k != pk+2; ++k)
     {
-       ret_val += (grid(i,j,k).*val) * R((i + Centering::x())*h - atPoint.x,
-                                         (j + Centering::y())*h - atPoint.y,
-                                         (k + Centering::z())*h - atPoint.z, h);
+        ret_val += (grid(i,j,k).*val) * R((i + Centering::x())*h - at_point.x,
+                                          (j + Centering::y())*h - at_point.y,
+                                          (k + Centering::z())*h - at_point.z, h);
     }
 
     return ret_val;

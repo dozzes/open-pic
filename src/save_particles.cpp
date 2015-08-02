@@ -64,7 +64,7 @@ void save_particles_group(const Grid& grid, const Particles& particles, const st
     {
         const Particle& particle = particles[p];
 
-        if ((group_name == "all" || (particle.group_name == group_name)) &&
+        if ((group_name == ParticleGroups::all_particles_name || (particle.group_name == group_name)) &&
             !particle.is_absorbed)
         {
             save_particle(grid, particle, fout);
@@ -129,7 +129,7 @@ for (; it != markers.end(); ++it)
 
 if (PIC::Config::save_all_particles())
 {
-    save_particles_group(grid, particles, "all");
+    save_particles_group(grid, particles, ParticleGroups::all_particles_name);
 }
 
 } // unnamed namespace

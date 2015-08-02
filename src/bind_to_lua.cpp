@@ -79,9 +79,9 @@ bool bind_to_lua(const char* lua_cfg_file_name, Grid& grid, Particles& particles
             .def(constructor<>())
             .def(constructor<const DblVector&>())
             .def(constructor<double /* x */, double /* y */, double /* z */>())
-            .def_readwrite("x", &DblVector::x)
-            .def_readwrite("y", &DblVector::y)
-            .def_readwrite("z", &DblVector::z)
+            .property("x", &DblVector::getX, &DblVector::setX)
+            .property("y", &DblVector::getY, &DblVector::setY)
+            .property("z", &DblVector::getZ, &DblVector::setZ)
             .def("abs", &DblVector::abs),
 
         // bind Cell

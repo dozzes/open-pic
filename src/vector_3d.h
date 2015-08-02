@@ -1,40 +1,100 @@
 #if !defined (VECTOR_3D_H)
 #define VECTOR_3D_H
 
-#include <vector>
 #include <ostream>
-#include <cmath>
+#include <cstddef>
 
-
-template <class T>
-struct Vector3D
+template<typename T>
+class Vector3D
 {
-    Vector3D() : x(0.0), y(0.0), z(0.0) {}
+public:
+    T x;
+    T y;
+    T z;
 
-    explicit
-    Vector3D(T _x, T _y, T _z)
-    : x(_x), y(_y), z(_z) {}
+public:
+    //! Sets all members to zero
+    Vector3D();
 
-    Vector3D(const Vector3D<T>& other)
-    : x(other.x), y(other.y), z(other.z) {}
+    //! Explicitly converts from one type to another
+    template<typename R>
+    explicit Vector3D(const Vector3D<R>& other);
 
-    Vector3D& operator=(const Vector3D& rhs)
-    {
-        if ((void*)this == (void*)&rhs)
-        {
-            return *this;
-        }
+    Vector3D(const T& x, const T& y, const T& z);
 
-        x = rhs.x;
-        y = rhs.y;
-        z = rhs.z;
+    Vector3D(const T coords[3]);
 
-        return *this;
-    }
+    // Get-Set methods
 
-    double abs2() const { return (x*x + y*y + z*z); }
-    double abs() const { return sqrt(abs2()); }
-    T x, y, z;
+    const T& getX() const;
+    void setX(const T& newX);
+
+    const T& getY() const;
+    void setY(const T& newY);
+
+    const T& getZ() const;
+    void setZ(const T& newZ);
+
+    void getv(T buffer[3]) const;
+    void setv(const T coords[3]);
+
+    void get(T& x, T& y, T& z) const;
+    void set(const T& x, const T& y, const T& z);
+
+    // Interface for indexing
+
+    const T& operator[] (size_t index) const;
+    T& operator[] (size_t index);
+
+    //! Considering vectors as matrices with one row
+    const T& operator() (size_t column) const;
+    T& operator() (size_t column);
+
+    // Standard operations
+
+    //! This does absolutely nothing, but it should be included for consistency
+    const Vector3D operator+ () const;
+
+    const Vector3D operator+ (const Vector3D& other) const;
+    Vector3D& operator+= (const Vector3D& other);
+
+    //! The same as multiplying *this by -1
+    const Vector3D operator- () const;
+
+    const Vector3D operator- (const Vector3D& other) const;
+    Vector3D& operator-= (const Vector3D& other);
+
+    //! Multiplying Vector3D by a scalar
+    template<class U> friend const Vector3D<U> operator*(const U& scalar, const Vector3D<U>& v);
+    template<class U> friend const Vector3D<U> operator*(const Vector3D<U>& v, const U& scalar);
+
+    //! Multiplying *this by a scalar
+    Vector3D& operator*= (const T& scalar);
+
+    //! Same as multiplication by 1/scalar, maybe more accurate but also slower
+    const Vector3D operator/ (const T& scalar) const;
+    Vector3D& operator/= (const T& scalar);
+
+    //! Calculate the dot/inner/scalar product
+    const T operator* (const Vector3D& other) const;
+
+    //! Calculate the cross/outer/vector product
+    const Vector3D operator% (const Vector3D& other) const;
+    Vector3D& operator%= (const Vector3D& other);
+
+    // Auxiliary methods
+
+    //! Returns the squared length of *this
+    const T getSqrLen() const;
+    
+    //! Returns the length of *this
+    const T getLen() const;
+
+    //! Returns the length of *this
+    const T abs() const;
+
+    //! Returns a vector with the same orientation, but with a length of 1
+    const Vector3D getUnit() const;
 };
 
 template<class T>
@@ -44,5 +104,7 @@ std::ostream& operator<<(std::ostream& out, const Vector3D<T>& v)
 }
 
 typedef Vector3D<double> DblVector;
+
+#include "vector_3d.inl"
 
 #endif // VECTOR_3D_H

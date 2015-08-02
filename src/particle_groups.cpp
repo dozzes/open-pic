@@ -14,7 +14,13 @@
 using namespace PIC;
 using namespace std;
 
+// static
+const char* ParticleGroups::all_particles_name = "all";
+
+// static
 ParticleGroups::MapNameToGroup ParticleGroups::groups_ = ParticleGroups::MapNameToGroup();
+
+// static
 double ParticleGroups::max_mp_ = std::numeric_limits<double>::min();
 
 ParticleGroups::ParticleGroup::ParticleGroup(const string &name_, double charge_, double mass_,

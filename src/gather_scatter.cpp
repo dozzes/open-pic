@@ -34,38 +34,38 @@ double R(double x, double y, double z, double h)
 
 /*****************************************************************************
 * Gather edge-centered values.                                               *
-*    x, y, z - specified position                                            *
+*    at_point - specified position                                           *
 *    val_x, val_y, val_z - Cell required values                              *
 *    ret_vec - result gathered value                                         *
 * Used to interpolate Bx, By, Bz for specified position                      *
 *****************************************************************************/
 void gather_edge(const Grid& grid,
-                 const DblVector& atPoint,
+                 const DblVector& at_point,
                  CellVectorValue val,
                  DblVector& ret_vec)
 {
-    ret_vec.x = gather_vector<EdgeXCentering>(grid, atPoint, val, &DblVector::x);
-    ret_vec.y = gather_vector<EdgeYCentering>(grid, atPoint, val, &DblVector::y);
-    ret_vec.z = gather_vector<EdgeZCentering>(grid, atPoint, val, &DblVector::z);
+    ret_vec.x = gather_vector<EdgeXCentering>(grid, at_point, val, &DblVector::x);
+    ret_vec.y = gather_vector<EdgeYCentering>(grid, at_point, val, &DblVector::y);
+    ret_vec.z = gather_vector<EdgeZCentering>(grid, at_point, val, &DblVector::z);
 }
 
 /*****************************************************************************
 * Gather face-centered values: Ex, Ey, Ez, UPx, UPy, UPz, UEx, UEy, UEz      *
-*    x, y, z - specified position                                            *
+*    at_point - specified position                                           *
 *    val_x, val_y, val_z - Pointers to cell members required                 *
 *    ret_vec - result gathered value                                         *
 * Used to interpolate Ex, Ey, Ez, UPx, UPy, UPz, UEx, UEy, UEz values        *
 * for specified position.                                                    *
 *****************************************************************************/
 void gather_face(const Grid& grid,
-                 const DblVector& atPoint,
+                 const DblVector& at_point,
                  CellVectorValue val,
                  DblVector& ret_vec)
 
 {
-    ret_vec.x = gather_vector<FaceXCentering>(grid, atPoint, val, &DblVector::x);
-    ret_vec.y = gather_vector<FaceYCentering>(grid, atPoint, val, &DblVector::y);
-    ret_vec.z = gather_vector<FaceZCentering>(grid, atPoint, val, &DblVector::z);
+    ret_vec.x = gather_vector<FaceXCentering>(grid, at_point, val, &DblVector::x);
+    ret_vec.y = gather_vector<FaceYCentering>(grid, at_point, val, &DblVector::y);
+    ret_vec.z = gather_vector<FaceZCentering>(grid, at_point, val, &DblVector::z);
 }
 
 /*****************************************************************************
@@ -76,9 +76,9 @@ void gather_face(const Grid& grid,
 * Used to interpolate density NP values for specified position.              *
 *                                                                            *
 *****************************************************************************/
-double gather_center(const Grid& grid, const DblVector& atPoint, CellScalarValue val)
+double gather_center(const Grid& grid, const DblVector& at_point, CellScalarValue val)
 {
-    return gather_scalar<CellCentering>(grid, atPoint, val);
+    return gather_scalar<CellCentering>(grid, at_point, val);
 }
 
 /******************************************************

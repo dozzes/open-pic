@@ -13,6 +13,9 @@
 class ParticleGroups
 {
 public:
+
+    static const char* all_particles_name;
+
     struct ParticleGroup
     {
         ParticleGroup(const std::string &name_,
