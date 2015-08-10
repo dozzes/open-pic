@@ -20,9 +20,9 @@ public:
     template<typename R>
     explicit Vector3D(const Vector3D<R>& other);
 
-    Vector3D(const T& x, const T& y, const T& z);
+    explicit Vector3D(const T& x, const T& y, const T& z);
 
-    Vector3D(const T coords[3]);
+    explicit Vector3D(const T coords[3]);
 
     // Get-Set methods
 

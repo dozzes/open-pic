@@ -122,13 +122,13 @@ void push_particle_boris(const Grid& grid, Particle& rp)
     const double tau_2qm = 0.5*Config::tau()*qm;
     const double tau_2qmc = tau_2qm / Constants::c();
 
-    const DblVector Vm(rp.v.x + tau_2qm*E.x,
-                       rp.v.y + tau_2qm*E.y,
-                       rp.v.z + tau_2qm*E.z);
+    const DblVector Vm(rp.v + tau_2qm*E);
+
 
     const DblVector V0(Vm.x + tau_2qmc*(Vm.y*B.z - Vm.z*B.y),
                        Vm.y + tau_2qmc*(Vm.z*B.x - Vm.x*B.z),
                        Vm.z + tau_2qmc*(Vm.x*B.y - Vm.y*B.x));
+     // Vm + tau_2qmc*(Vm % B);
 
     const double d = 2.0*tau_2qmc/(1.0 + tau_2qmc*tau_2qmc*(B.x*B.x + B.y*B.y + B.z*B.z));
 
@@ -136,9 +136,8 @@ void push_particle_boris(const Grid& grid, Particle& rp)
                        Vm.y + d*(V0.z*B.x - V0.x*B.z),
                        Vm.z + d*(V0.x*B.y - V0.y*B.x));
 
-    rp.v.x = Vp.x + tau_2qm*E.x;
-    rp.v.y = Vp.y + tau_2qm*E.y;
-    rp.v.z = Vp.z + tau_2qm*E.z;
+    rp.v = Vp + tau_2qm*E;
+    
 }
 
 void (*push_particle)(const Grid&, Particle&);
