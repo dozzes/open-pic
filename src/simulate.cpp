@@ -130,7 +130,7 @@ void push_particle_boris(const Grid& grid, Particle& rp)
                        Vm.z + tau_2qmc*(Vm.x*B.y - Vm.y*B.x));
      // Vm + tau_2qmc*(Vm % B);
 
-    const double d = 2.0*tau_2qmc/(1.0 + tau_2qmc*tau_2qmc*(B.x*B.x + B.y*B.y + B.z*B.z));
+    const double d = 2.0*tau_2qmc/(1.0 + tau_2qmc*tau_2qmc*B.sqrLen());
 
     const DblVector Vp(Vm.x + d*(V0.y*B.z - V0.z*B.y),
                        Vm.y + d*(V0.z*B.x - V0.x*B.z),
@@ -408,7 +408,7 @@ void local_Alfven_CFL(Grid& grid, size_t i, size_t j, size_t k)
     DblVector vec_to_point(i*h, j*h, k*h);
     DblVector vec_B;
     gather_edge(grid, vec_to_point, &Cell::B, vec_B);
-    const double B = vec_B.abs();
+    const double B = vec_B.length();
 
     const double mp = ParticleGroups::max_mp() * PIC::Constants::mp();
     const double pi = Constants::pi();

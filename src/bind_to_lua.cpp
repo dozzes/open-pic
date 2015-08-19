@@ -79,10 +79,11 @@ bool bind_to_lua(const char* lua_cfg_file_name, Grid& grid, Particles& particles
             .def(constructor<>())
             .def(constructor<const DblVector&>())
             .def(constructor<double /* x */, double /* y */, double /* z */>())
-            .property("x", &DblVector::getX, &DblVector::setX)
-            .property("y", &DblVector::getY, &DblVector::setY)
-            .property("z", &DblVector::getZ, &DblVector::setZ)
-            .def("abs", &DblVector::abs),
+            .property("x", &DblVector::x, &DblVector::set_x)
+            .property("y", &DblVector::y, &DblVector::set_y)
+            .property("z", &DblVector::z, &DblVector::set_z)
+            .def("length", &DblVector::length)
+            .def("abs", &DblVector::length),
 
         // bind Cell
         class_<Cell>("Cell")

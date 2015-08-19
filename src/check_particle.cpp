@@ -88,7 +88,7 @@ bool check_particle_move(Particle& particle, const Grid& grid, const DblVector& 
 
         const std::string msg = boost::str(boost::format("Step = %1%:\n\tError CFL:"
                                                   "\n\tparticle's home cell = (%2%, %3%, %4%);"
-                                                  "\n\tdr = (%5%, %6%, %7%),\n\tdr.abs() = %8%; h = %9%;"
+                                                  "\n\tdr = (%5%, %6%, %7%),\n\tdr.length() = %8%; h = %9%;"
                                                   "\n\tparticle [%10%] at (%11%, %12%, %13%)"
                                                   "\n\tfield values at particle position:"
                                                   "\n\t\t B = %14%, Bx = %15%, By = %16%, Bz = %17%"
@@ -98,12 +98,12 @@ bool check_particle_move(Particle& particle, const Grid& grid, const DblVector& 
                                                   % pi
                                                   % pj
                                                   % pk
-                                                  % dr.x % dr.y % dr.z % (dr.abs())
+                                                  % dr.x % dr.y % dr.z % (dr.length())
                                                   % h
                                                   % particle.group_name
                                                   % particle.r.x % particle.r.y % particle.r.z
-                                                  % point_val.B.abs() % point_val.B.x % point_val.B.y % point_val.B.z
-                                                  % point_val.E.abs() % point_val.E.x % point_val.E.y % point_val.E.z
+                                                  % point_val.B.length() % point_val.B.x % point_val.B.y % point_val.B.z
+                                                  % point_val.E.length() % point_val.E.x % point_val.E.y % point_val.E.z
                                                   % grid(pi, pj, pk).state());
 
         const int tid = omp_get_thread_num();

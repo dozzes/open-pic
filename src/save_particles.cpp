@@ -33,18 +33,18 @@ void save_particle(const Grid& grid, const Particle& particle, FILE* fout)
 
     fprintf(fout,
             "%e\t%e\t%e\t"   // (particle.r.x/L), particle.r.y/L), (particle.r.z/L)
-            "%e\t"           // (particle.v.abs()/U)
+            "%e\t"           // (particle.v.length()/U)
             "%e\t%e\t%e\t"   // (particle.v.x/U), particle.v.y/U), (particle.r.z/U)
-            "%e\t"           // (point_val.B.abs()/B)
+            "%e\t"           // (point_val.B.length()/B)
             "%e\t%e\t%e\t"   // (point_val.B.x/B), (point_val.B.y/B), (point_val.B.z/B)
-            "%e\t"           // (point_val.E.abs()/E)
+            "%e\t"           // (point_val.E.length()/E)
             "%e\t%e\t%e\n",  // (point_val.B.x/B), (point_val.B.y/B), (point_val.B.z/B)
             (particle.r.x / L), (particle.r.y / L), (particle.r.z / L),
-            (particle.v.abs() / U),
+            (particle.v.length() / U),
             (particle.v.x / U), (particle.v.y / U), (particle.v.z / U),
-            (point_val.B.abs() / B),
+            (point_val.B.length() / B),
             (point_val.B.x / B), (point_val.B.y / B), (point_val.B.z / B),
-            (point_val.E.abs() / E),
+            (point_val.E.length() / E),
             (point_val.E.x / E), (point_val.E.y / E), (point_val.E.z / E));
 }
 

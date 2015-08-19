@@ -22,71 +22,39 @@ inline Vector3D<T>::Vector3D(const T coords[3])
 {}
  
 template<typename T>
-inline const T& Vector3D<T>::getX() const
+inline const T& Vector3D<T>::x() const
 {
     return x;
 }
  
 template<typename T>
-inline void Vector3D<T>::setX(const T& newX)
+inline void Vector3D<T>::set_x(const T& newX)
 {
     x = newX;
 }
  
 template<typename T>
-inline const T& Vector3D<T>::getY() const
+inline const T& Vector3D<T>::y() const
 {
     return y;
 }
  
 template<typename T>
-inline void Vector3D<T>::setY(const T& newY)
+inline void Vector3D<T>::set_y(const T& newY)
 {
     y = newY;
 }
  
 template<typename T>
-inline const T& Vector3D<T>::getZ() const
+inline const T& Vector3D<T>::z() const
 {
     return z;
 }
  
 template<typename T>
-inline void Vector3D<T>::setZ(const T& newZ)
+inline void Vector3D<T>::set_z(const T& newZ)
 {
     z = newZ;
-}
- 
-template<typename T>
-inline void Vector3D<T>::getv(T buffer[3]) const
-{
-    buffer[0] = x;
-    buffer[1] = y;
-    buffer[2] = z;
-}
- 
-template<typename T>
-inline void Vector3D<T>::setv(const T coords[3])
-{
-    x = coords[0];
-    y = coords[1];
-    z = coords[2];
-}
- 
-template<typename T>
-inline void Vector3D<T>::get(T& x, T& y, T& z) const
-{
-    x = this->x;
-    y = this->y;
-    z = this->z;
-}
- 
-template<typename T>
-inline void Vector3D<T>::set(const T& x, const T& y, const T& z)
-{
-    this->x = x;
-    this->y = y;
-    this->z = z;
 }
  
 template<typename T>
@@ -241,28 +209,22 @@ inline Vector3D<T>& Vector3D<T>::operator%= (const Vector3D& other)
 }
  
 template<typename T>
-inline const T Vector3D<T>::getSqrLen() const
+inline const T Vector3D<T>::sqr_length() const
 {
     return x*x + y*y + z*z;
 }
  
 template<typename T>
-inline const T Vector3D<T>::getLen() const
+inline const T Vector3D<T>::length() const
 {
-    return std::sqrt(getSqrLen());
+    return std::sqrt(sqr_length());
 }
 
 template<typename T>
-inline const T Vector3D<T>::abs() const
+inline const Vector3D<T> Vector3D<T>::unit() const
 {
-    return getLen();
-}
-
-template<typename T>
-inline const Vector3D<T> Vector3D<T>::getUnit() const
-{
-    if (getSqrLen() != 0)
-        return *this / getLen();
+    if (sqr_length() != 0)
+        return *this / length();
  
     return *this;
 }

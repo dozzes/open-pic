@@ -24,22 +24,16 @@ public:
 
     explicit Vector3D(const T coords[3]);
 
-    // Get-Set methods
+    // Accessors
 
-    const T& getX() const;
-    void setX(const T& newX);
+    const T& x() const;
+    void set_x(const T& newX);
 
-    const T& getY() const;
-    void setY(const T& newY);
+    const T& y() const;
+    void set_y(const T& newY);
 
-    const T& getZ() const;
-    void setZ(const T& newZ);
-
-    void getv(T buffer[3]) const;
-    void setv(const T coords[3]);
-
-    void get(T& x, T& y, T& z) const;
-    void set(const T& x, const T& y, const T& z);
+    const T& z() const;
+    void set_z(const T& newZ);
 
     // Interface for indexing
 
@@ -85,16 +79,13 @@ public:
     // Auxiliary methods
 
     //! Returns the squared length of *this
-    const T getSqrLen() const;
-    
-    //! Returns the length of *this
-    const T getLen() const;
+    const T sqr_length() const;
 
     //! Returns the length of *this
-    const T abs() const;
+    const T length() const;
 
     //! Returns a vector with the same orientation, but with a length of 1
-    const Vector3D getUnit() const;
+    const Vector3D unit() const;
 };
 
 template<class T>

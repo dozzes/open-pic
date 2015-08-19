@@ -66,9 +66,9 @@ void gather_face(const Grid& grid,
 
 /*****************************************************************************
 * Gather cell-centered value.                                                *
-*   at_point - specified position                                            *
-*   val - Pointer to cell member required                                    *
-*   ret_val - result gathered value                                          *
+*    at_point - specified position                                           *
+*    val - Pointer to cell member required                                   *
+*    ret_val - result gathered value                                         *
 * Used to interpolate density NP values for specified position.              *
 *                                                                            *
 *****************************************************************************/
