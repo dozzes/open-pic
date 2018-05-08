@@ -1,14 +1,12 @@
-#if !defined (PARTICLE_GROUPS_H)
-#define PARTICLE_GROUPS_H
+#pragma once
+
+#include "opic_fwd.h"
+#include "diagnostics.h"
 
 #include <iosfwd>
 #include <string>
 #include <vector>
 #include <map>
-
-#include "opic_fwd.h"
-#include "diagnostics.h"
-
 
 class ParticleGroups
 {
@@ -61,5 +59,3 @@ private:
 };
 
 std::ostream& operator<<(std::ostream& out, const ParticleGroups& pg);
-
-#endif // PARTICLE_GROUPS_H

@@ -1,8 +1,6 @@
-#if !defined (USE_LUA_H)
-#define USE_LUA_H
+#pragma once
 
 #include "inc_lua.h"
-
 
 struct UseLua
 {
@@ -18,5 +16,3 @@ private:
 
     static LuaState luaState_;
 };
-
-#endif // USE_LUA_H

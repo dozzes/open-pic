@@ -1,8 +1,4 @@
-#if !defined (SAVE_GRID_H)
-#define SAVE_GRID_H
-
-#include <cstdio>
-#include <vector>
+#pragma once
 
 #include "grid_filters.h"
 #include "gather_scatter.h"
@@ -10,6 +6,9 @@
 #include "constants.h"
 #include "io_utilities.h"
 
+#include <cstdio>
+#include <vector>
+#include <string>
 
 template<class GridT, class DensGridT, class PointFilterFoT>
 void save_subgrid(const GridT& grid, const DensGridT& dens_grid, const PointFilterFoT& point_filter)
@@ -60,7 +59,7 @@ void save_subgrid(const GridT& grid, const DensGridT& dens_grid, const PointFilt
 
             gather_face(dens_grid, point, &DensGridT::NodeType::UP, dgNode.UP);
 
-            double vA = point_val.B.length() / sqrt(4 * Constants::pi() * point_val.NP * Constants::mp());
+            double vA = point_val.B.abs()/sqrt(4*Constants::pi()*point_val.NP*Constants::mp());
 
             const double d = 0.5*h;
             const double Ex_r = gather_vector<PIC::FaceXCentering>(grid, point.x + d, point.y, point.z, &GridT::NodeType::E, &DblVector::x);
@@ -72,33 +71,33 @@ void save_subgrid(const GridT& grid, const DensGridT& dens_grid, const PointFilt
             const double Ez_r = gather_vector<PIC::FaceZCentering>(grid, point.x, point.y, point.z + d, &GridT::NodeType::E, &DblVector::z);
             const double Ez_l = gather_vector<PIC::FaceZCentering>(grid, point.x, point.y, point.z - d, &GridT::NodeType::E, &DblVector::z);
 
-            const double divE = (L / E)*((Ex_r - Ex_l) + (Ey_r - Ey_l) + (Ez_r - Ez_l)) / h;
+            const double divE = (L/E)*((Ex_r - Ex_l) + (Ey_r - Ey_l) + (Ez_r - Ez_l))/h;
 
             fprintf(fout,
-                    "%e\t%e\t%e\t" /* point.x/L, point.y/L, point.z/L */
-                    "%e\t" /* dgNode.NP/N */
-                    "%e\t" /* point_val.B.length()/B */
-                    "%e\t%e\t%e\t" /* point_val.B.x/B, point_val.B.y/B, point_val.B.z/B */
-                    "%e\t" /* point_val.E.length()/E */
-                    "%e\t%e\t%e\t" /* point_val.E.x/E, point_val.E.y/E, point_val.E.z/E */
-                    "%e\t" /* div(E)/(E/L) */
-                    "%e\t" /* dgNode.UP.length()/U */
-                    "%e\t%e\t%e\t" /* dgNode.UP.x/U, dgNode.UP.y/U, dgNode.UP.z/U */
-                    "%e\t" /* dgNode.UP.length()/vA */
-                    "%e\t" /* point_val.UE.length()/U */
+                    "%e\t%e\t%e\t"  /* point.x/L, point.y/L, point.z/L */
+                    "%e\t"          /* dgNode.NP/N */
+                    "%e\t"          /* point_val.B.abs()/B */
+                    "%e\t%e\t%e\t"  /* point_val.B.x/B, point_val.B.y/B, point_val.B.z/B */
+                    "%e\t"          /* point_val.E.abs()/E */
+                    "%e\t%e\t%e\t"  /* point_val.E.x/E, point_val.E.y/E, point_val.E.z/E */
+                    "%e\t"          /* div(E)/(E/L) */
+                    "%e\t"          /* dgNode.UP.abs()/U */
+                    "%e\t%e\t%e\t"  /* dgNode.UP.x/U, dgNode.UP.y/U, dgNode.UP.z/U */
+                    "%e\t"          /* dgNode.UP.abs()/vA */
+                    "%e\t"          /* point_val.UE.abs()/U */
                     "%e\t%e\t%e\n", /* dpoint_val.UE.x/U, point_val.UE.y/U, point_val.UE.z/U */
-                    (point.x / L), (point.y / L), (point.z / L),
-                    (dgNode.NP / N),
-                    (point_val.B.length() / B),
-                    (point_val.B.x / B), (point_val.B.y / B), (point_val.B.z / B),
-                    (point_val.E.length() / E),
-                    (point_val.E.x / E), (point_val.E.y / E), (point_val.E.z / E),
+                    (point.x/L), (point.y/L), (point.z/L),
+                    (dgNode.NP/N),
+                    (point_val.B.abs()/B),
+                    (point_val.B.x/B), (point_val.B.y/B), (point_val.B.z/B),
+                    (point_val.E.abs()/E),
+                    (point_val.E.x/E), (point_val.E.y/E), (point_val.E.z/E),
                     divE,
-                    (dgNode.UP.length() / U),
-                    (dgNode.UP.x / U), (dgNode.UP.y / U), (dgNode.UP.z / U),
-                    (dgNode.UP.length() / vA),
-                    (point_val.UE.length() / U),
-                    (point_val.UE.x / U), (point_val.UE.y / U), (point_val.UE.z / U));
+                    (dgNode.UP.abs()/U),
+                    (dgNode.UP.x/U), (dgNode.UP.y/U), (dgNode.UP.z/U),
+                    (dgNode.UP.abs()/vA), // Ma
+                    (point_val.UE.abs()/U),
+                    (point_val.UE.x/U), (point_val.UE.y/U), (point_val.UE.z/U));
         }
     }
 
@@ -170,5 +169,8 @@ void save_grid(const GridT& grid, const DensGridT& dens_grid, const std::string&
     }
 }
 
-#endif // SAVE_GRID_H
+template<class NodeT> class GridContainer;
+struct Cell;
+typedef GridContainer<Cell> Grid;
 
+void save_grid_node(const std::string& prefix, const Grid& grid);

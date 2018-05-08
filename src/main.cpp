@@ -3,12 +3,10 @@
 #include "bind_to_lua.h"
 #include "simulate.h"
 #include "io_utilities.h"
-
 #include "particles.h"
 #include "grid.h"
 
 #include <boost/format.hpp>
-
 
 int main(int argc, char* argv[])
 {
@@ -22,7 +20,7 @@ int main(int argc, char* argv[])
     {
         if (argc != 2)
         {
-            std::cerr << "Usage: pic3d <setup script in Lua>\n";
+            std::cerr << "Usage: opic <setup script in Lua>\n";
             std::cerr << "Press any key to exit ...";
             std::cin.get();
             return -1;
@@ -31,7 +29,7 @@ int main(int argc, char* argv[])
         std::cout << "\nRun configuration script: \"" << argv[1] << "\" ...\n\n";
         if (!bind_to_lua(argv[1], grid, particles))
         {
-            std::cerr << "\nLua script failed.";
+            std::cerr << "\nLua script running failed.";
             std::cerr << "\nPress any key to exit ...";
             std::cin.get();
             return -1;

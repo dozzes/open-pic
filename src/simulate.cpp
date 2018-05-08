@@ -1,7 +1,4 @@
-#include <stdexcept>
-#include <omp.h>
-#include <boost/format.hpp>
-
+#include "simulate.h"
 #include "config.h"
 #include "call_lua_function.h"
 #include "grid.h"
@@ -12,8 +9,10 @@
 #include "save_grid.h"
 #include "save_particles.h"
 
-#include "simulate.h"
-
+#include <boost/format.hpp>
+#include <boost/exception/diagnostic_information.hpp>
+#include <omp.h>
+#include <stdexcept>
 
 namespace PIC {
 
@@ -21,7 +20,7 @@ namespace PIC {
 *                                                           *
 * I step                                                    *
 *                                                           *
-* Calculate magnetic field in half time step  (m+1/2)I step *
+* Calculate magnetic field in half time step  (m+1/2) step  *
 *                                                           *
 ************************************************************/
 void calc_magnetic_field_half_time(Grid& grid)
@@ -40,17 +39,14 @@ void calc_magnetic_field_half_time(Grid& grid)
     {
         Cell& cell = grid(kx,ky,kz);
 
-        if (cell.state() == PIC::cs_active)
-        {
-            cell.B.x -= ctau_2h * ((cell.E.z - grid(kx,ky - 1,kz).E.z) -
-                                   (cell.E.y - grid(kx,ky,kz - 1).E.y));
+        cell.B.x -= ctau_2h*((cell.E.z - grid(kx,ky - 1,kz).E.z) -
+                             (cell.E.y - grid(kx,ky,kz - 1).E.y));
 
-            cell.B.y -= ctau_2h * ((cell.E.x - grid(kx,ky,kz - 1).E.x) -
-                                   (cell.E.z - grid(kx - 1,ky,kz).E.z));
+        cell.B.y -= ctau_2h*((cell.E.x - grid(kx,ky,kz - 1).E.x) -
+                             (cell.E.z - grid(kx - 1,ky,kz).E.z));
 
-            cell.B.z -= ctau_2h * ((cell.E.y - grid(kx - 1,ky,kz).E.y) -
-                                   (cell.E.x - grid(kx,ky - 1,kz).E.x));
-        }
+        cell.B.z -= ctau_2h*((cell.E.y - grid(kx - 1,ky,kz).E.y) -
+                             (cell.E.x - grid(kx,ky - 1,kz).E.x));
     }
 }
 
@@ -73,30 +69,31 @@ void push_particle_std(const Grid& grid, Particle& rp)
     ParticleGroups part_groups;
     const ParticleGroups::ParticleGroup& part_group = part_groups[rp.group_name];
 
-    const double qm = part_group.charge / part_group.mass * Constants::e_mp();
+    const double qm = part_group.charge/part_group.mass*Constants::e_mp();
 
-    const double tau_qm = Config::tau() * qm;
-    const double tau_2qmc = 0.5 * tau_qm / Constants::c();
+    const double tau_qm = Config::tau()*qm;
+    const double tau_2qmc = 0.5*tau_qm/Constants::c();
 
-    const double a = tau_2qmc * Bp.x;
-    const double b = tau_2qmc * Bp.y;
-    const double c = tau_2qmc * Bp.z;
+    const double a = tau_2qmc*Bp.x;
+    const double b = tau_2qmc*Bp.y;
+    const double c = tau_2qmc*Bp.z;
 
-    const double A = rp.v.x + tau_qm * Ep.x + c*rp.v.y - b*rp.v.z;
-    const double B = rp.v.y + tau_qm * Ep.y + a*rp.v.z - c*rp.v.x;
-    const double C = rp.v.z + tau_qm * Ep.z + b*rp.v.x - a*rp.v.y;
+    const double A = rp.v.x + tau_qm*Ep.x + c*rp.v.y - b*rp.v.z;
+    const double B = rp.v.y + tau_qm*Ep.y + a*rp.v.z - c*rp.v.x;
+    const double C = rp.v.z + tau_qm*Ep.z + b*rp.v.x - a*rp.v.y;
 
-    const double a2 = a * a;
-    const double b2 = b * b;
-    const double c2 = c * c;
+    const double a2 = a*a;
+    const double b2 = b*b;
+    const double c2 = c*c;
 
-    const double D = 1.0 / (a2 + b2 + c2 + 1.0);
+    const double D = 1.0/(a2 + b2 + c2 + 1.0);
 
-    const double ab = a * b;
-    const double ac = a * c;
-    const double bc = b * c;
+    const double ab = a*b;
+    const double ac = a*c;
+    const double bc = b*c;
 
-    /* Mathematica solution:
+    /*
+    Mathematica solution:
     x -> (A + a^2 A + a b B + B c - b C + a c C)/(1 + a^2 + b^2 + c^2),
     y -> (a A b + B + b^2 B - A c + a C + b c C)/(1 + a^2 + b^2 + c^2),
     z -> (A b - a B + a A c + b B c + C + c^2 C)/(1 + a^2 + b^2 + c^2).
@@ -118,52 +115,44 @@ void push_particle_boris(const Grid& grid, Particle& rp)
     ParticleGroups part_groups;
     const ParticleGroups::ParticleGroup& part_group = part_groups[rp.group_name];
 
-    const double qm = part_group.charge / part_group.mass * Constants::e_mp();
+    const double qm = part_group.charge/part_group.mass*Constants::e_mp();
     const double tau_2qm = 0.5*Config::tau()*qm;
-    const double tau_2qmc = tau_2qm / Constants::c();
+    const double tau_2qmc = tau_2qm/Constants::c();
 
-    const DblVector Vm(rp.v + tau_2qm*E);
-
-
-    const DblVector V0(Vm.x + tau_2qmc*(Vm.y*B.z - Vm.z*B.y),
-                       Vm.y + tau_2qmc*(Vm.z*B.x - Vm.x*B.z),
-                       Vm.z + tau_2qmc*(Vm.x*B.y - Vm.y*B.x));
-     // Vm + tau_2qmc*(Vm % B);
-
-    const double d = 2.0*tau_2qmc/(1.0 + tau_2qmc*tau_2qmc*B.sqrLen());
-
-    const DblVector Vp(Vm.x + d*(V0.y*B.z - V0.z*B.y),
-                       Vm.y + d*(V0.z*B.x - V0.x*B.z),
-                       Vm.z + d*(V0.x*B.y - V0.y*B.x));
+    const DblVector Vm = rp.v + tau_2qm*E;
+    const DblVector V0 = Vm + tau_2qmc*(Vm % B);
+    const double d = 2.0*tau_2qmc/(1.0 + tau_2qmc*tau_2qmc*B.get_sqr_len());
+    const DblVector Vp = Vm + d*(V0 % B);
 
     rp.v = Vp + tau_2qm*E;
-    
 }
 
 void (*push_particle)(const Grid&, Particle&);
 
-vector<DensityGrid> densityGrids;
+vector<DensityGrid> density_grids;
 
-void (*scatter_particle)(const Particle&, DensityGrid&);
+void (*scatter_particle)(const Particle&, DensityGrid&, const DblVector&);
 
+namespace {
 
-void move_particles_half_time(const Grid& grid,
-                              Particles& particles,
-                              const std::string& group_name)
+void log_error(const char* msg)
 {
-    const size_t removed_num = particles.remove_absorbed();
-   
-    if (removed_num > 0)
-    {
-       std::cout << removed_num << " particle(s) removed.\n";
-    }
-   
-    const double tau_2 = Config::tau_2();
-   
+    const int tid = omp_get_thread_num();
+    const std::string log_file_name = str(boost::format("opic_thread_%1%_move_particles_half_time_err.log") % tid);
+    std::ofstream ofs_log(log_file_name.c_str(), std::ios_base::app);
+    ofs_log << msg << std::endl;
+};
+
+}
+
+void move_particles_half_time(const Grid& grid, Particles& particles, const std::string& group_name)
+{
+    particles.remove_inactives();
+
     const long particles_num = particles.size();
-   
+
     long err_count = 0;
-   
+
     #pragma omp parallel for reduction(+: err_count)
     for (long p = 0; p < particles_num; ++p)
     {
@@ -171,39 +160,41 @@ void move_particles_half_time(const Grid& grid,
         {
             Particle& particle = particles[p];
 
-            if ((group_name == ParticleGroups::all_particles_name || particle.group_name == group_name) &&
-                validate_particle(particle, grid) &&
+            if ((group_name == ParticleGroups::all_particles_name || group_name == particle.group_name) &&
                 (err_count == 0))
             {
-                push_particle(grid, particle);
-
-                const DblVector dr(tau_2 * particle.v.x, tau_2 * particle.v.y, tau_2 * particle.v.z);
-
-                if (check_particle_move(particle, grid, dr))
+                if (is_particle_can_move(particles, p, grid))
                 {
-                    particle.r += dr;
-
-                    if (validate_particle(particle, grid))
+                    push_particle(grid, particle);
+                    const DblVector dr = PIC::Config::tau_2()*particle.v;
+                    if (!check_particle_move(particle, grid, dr))
+                    {
+                        ++err_count;
+                    }
+                    else if (is_particle_can_scatter(particles, p, grid, dr))
                     {
                         const int thread_num = omp_get_thread_num();
-                        scatter_particle(particle, densityGrids[thread_num]);
+                        scatter_particle(particle, density_grids[thread_num], dr);
+                        particle.r += dr;
                     }
-                }
-                else
-                {
-                    ++err_count;
                 }
             }
         }
+        catch (std::exception & e)
+        {
+            log_error(e.what());
+            ++err_count;
+        }
         catch (...)
         {
+            log_error(boost::current_exception_diagnostic_information().c_str());
             ++err_count;
         }
     } // for (long p = 0; p < particles_num; ++p)
 
    if (err_count != 0)
    {
-      throw domain_error("CFL condition violated! See opic_thread_*_error.log files for details.");
+      throw domain_error("Error occured during the simulation!\nSee opic_thread_*_err.log files for details.");
    }
 }
 
@@ -219,16 +210,15 @@ void move_particles_full_time(const Grid& grid,
                               const std::string& group_name) // m+1
 {
     const double tau_2 = Config::tau_2();
-
     const long particles_num = particles.size();
 
     #pragma omp parallel for
     for (long p = 0; p < particles_num; ++p)
     {
         Particle& particle = particles[p];
-
-        if ((group_name == ParticleGroups::all_particles_name || particle.group_name == group_name) &&
-            validate_particle(particle, grid))
+        if ((group_name == ParticleGroups::all_particles_name ||
+             particle.group_name == group_name) &&
+             is_particle_can_move(particles, p, grid))
         {
             particle.r += tau_2*particle.v;
         }
@@ -268,21 +258,18 @@ void calc_electrons_velocity(Grid& grid)
     {
         Cell& cell = grid(kx, ky, kz);
 
-        if (cell.state() == PIC::cs_active)
-        {
-            // NP for UEx
-            NP = 0.5 * (cell.NP + grid(kx - 1, ky, kz).NP);
-            cell.UE.x = cell.UP.x - c_4pi_e_h / NP * ((grid(kx, ky + 1, kz).B.z - cell.B.z) -
-                                                      (grid(kx, ky, kz + 1).B.y - cell.B.y));
-            // NP for UEy
-            NP = 0.5 * (cell.NP + grid(kx, ky - 1, kz).NP);
-            cell.UE.y = cell.UP.y - c_4pi_e_h / NP * ((grid(kx, ky, kz + 1).B.x - cell.B.x) -
-                                                      (grid(kx + 1, ky, kz).B.z - cell.B.z));
-            //NP for UEz
-            NP = 0.5 * (cell.NP + grid(kx, ky, kz - 1).NP);
-            cell.UE.z = cell.UP.z - c_4pi_e_h / NP * ((grid(kx + 1, ky, kz).B.y - cell.B.y) -
-                                                      (grid(kx, ky + 1, kz).B.x - cell.B.x));
-        }
+        // NP for UEx
+        NP = 0.5*(cell.NP + grid(kx - 1, ky, kz).NP);
+        cell.UE.x = cell.UP.x - c_4pi_e_h/NP*((grid(kx, ky + 1, kz).B.z - cell.B.z) -
+                                              (grid(kx, ky, kz + 1).B.y - cell.B.y));
+        // NP for UEy
+        NP = 0.5*(cell.NP + grid(kx, ky - 1, kz).NP);
+        cell.UE.y = cell.UP.y - c_4pi_e_h/NP*((grid(kx, ky, kz + 1).B.x - cell.B.x) -
+                                              (grid(kx + 1, ky, kz).B.z - cell.B.z));
+        //NP for UEz
+        NP = 0.5*(cell.NP + grid(kx, ky, kz - 1).NP);
+        cell.UE.z = cell.UP.z - c_4pi_e_h/NP*((grid(kx + 1, ky, kz).B.y - cell.B.y) -
+                                              (grid(kx, ky + 1, kz).B.x - cell.B.x));
     }
 }
 
@@ -296,57 +283,54 @@ void calc_electrons_velocity(Grid& grid)
 void calc_electric_field(Grid& grid)
 {
     DblVector UE, B;
-    
+
     const index_t kd = 1;
-    
+
     const index_t to_kx = (grid.size_x() - kd);
     const index_t to_ky = (grid.size_y() - kd);
     const index_t to_kz = (grid.size_z() - kd);
-    
+
     for (index_t kx = kd; kx != to_kx; ++kx)
     for (index_t ky = kd; ky != to_ky; ++ky)
     for (index_t kz = kd; kz != to_kz; ++kz)
     {
         Cell& cell = grid(kx, ky, kz);
 
-        if (cell.state() == PIC::cs_active)
-        {
-            // calculate Ex
-            B.y = 0.5 * (cell.B.y + grid(kx, ky, kz + 1).B.y);
-            B.z = 0.5 * (cell.B.z + grid(kx, ky + 1, kz).B.z);
+        // calculate Ex
+        B.y = 0.5*(cell.B.y + grid(kx, ky, kz + 1).B.y);
+        B.z = 0.5*(cell.B.z + grid(kx, ky + 1, kz).B.z);
 
-            UE.y = 0.25 * (cell.UE.y + grid(kx, ky + 1, kz).UE.y +
-                           grid(kx - 1, ky, kz).UE.y + grid(kx - 1, ky + 1, kz).UE.y);
+        UE.y = 0.25*(cell.UE.y + grid(kx, ky + 1, kz).UE.y +
+                     grid(kx - 1, ky, kz).UE.y + grid(kx - 1, ky + 1, kz).UE.y);
 
-            UE.z = 0.25 * (cell.UE.z + grid(kx, ky, kz + 1).UE.z +
-                           grid(kx - 1, ky, kz).UE.z + grid(kx - 1, ky, kz + 1).UE.z);
+        UE.z = 0.25*(cell.UE.z + grid(kx, ky, kz + 1).UE.z +
+                     grid(kx - 1, ky, kz).UE.z + grid(kx - 1, ky, kz + 1).UE.z);
 
-            cell.E.x = (UE.z * B.y - UE.y * B.z) / Constants::c();
+        cell.E.x = (UE.z*B.y - UE.y*B.z)/Constants::c();
 
-            // calculate Ey
-            B.z = 0.5 * (cell.B.z + grid(kx + 1, ky, kz).B.z);
-            B.x = 0.5 * (cell.B.x + grid(kx, ky, kz + 1).B.x);
+        // calculate Ey
+        B.z = 0.5*(cell.B.z + grid(kx + 1, ky, kz).B.z);
+        B.x = 0.5*(cell.B.x + grid(kx, ky, kz + 1).B.x);
 
-            UE.x = 0.25 * (cell.UE.x + grid(kx + 1, ky, kz).UE.x +
-                           grid(kx, ky - 1, kz).UE.x + grid(kx + 1, ky - 1, kz).UE.x);
+        UE.x = 0.25*(cell.UE.x + grid(kx + 1, ky, kz).UE.x +
+                     grid(kx, ky - 1, kz).UE.x + grid(kx + 1, ky - 1, kz).UE.x);
 
-            UE.z = 0.25 * (cell.UE.z + grid(kx, ky, kz + 1).UE.z +
-                           grid(kx, ky - 1, kz).UE.z + grid(kx, ky - 1, kz + 1).UE.z);
+        UE.z = 0.25*(cell.UE.z + grid(kx, ky, kz + 1).UE.z +
+                     grid(kx, ky - 1, kz).UE.z + grid(kx, ky - 1, kz + 1).UE.z);
 
-            cell.E.y = (UE.x * B.z - UE.z * B.x) / Constants::c();
+        cell.E.y = (UE.x*B.z - UE.z*B.x)/Constants::c();
 
-            // calculate Ez
-            B.x = 0.5 * (cell.B.x + grid(kx, ky + 1, kz).B.x);
-            B.y = 0.5 * (cell.B.y + grid(kx + 1, ky, kz).B.y);
+        // calculate Ez
+        B.x = 0.5*(cell.B.x + grid(kx, ky + 1, kz).B.x);
+        B.y = 0.5*(cell.B.y + grid(kx + 1, ky, kz).B.y);
 
-            UE.y = 0.25 * (cell.UE.y + grid(kx, ky + 1, kz).UE.y +
-                           grid(kx, ky, kz - 1).UE.y + grid(kx, ky + 1, kz - 1).UE.y);
+        UE.y = 0.25*(cell.UE.y + grid(kx, ky + 1, kz).UE.y +
+                     grid(kx, ky, kz - 1).UE.y + grid(kx, ky + 1, kz - 1).UE.y);
 
-            UE.x = 0.25 * (cell.UE.x + grid(kx + 1, ky, kz).UE.x +
-                           grid(kx, ky, kz - 1).UE.x + grid(kx + 1, ky, kz - 1).UE.x);
+        UE.x = 0.25*(cell.UE.x + grid(kx + 1, ky, kz).UE.x +
+                     grid(kx, ky, kz - 1).UE.x + grid(kx + 1, ky, kz - 1).UE.x);
 
-            cell.E.z = (UE.y * B.x - UE.x * B.y) / Constants::c();
-        }
+        cell.E.z = (UE.y*B.x - UE.x*B.y)/Constants::c();
     }
 }
 
@@ -361,24 +345,19 @@ void set_grid_UP(const Grid& grid, DensityGridType& dg_group)
     for (index_t j = m; j != (grid.size_y() - m); ++j)
     for (index_t k = m; k != (grid.size_z() - m); ++k)
     {
-        const CellState cell_state = grid(i,j,k).state();
+        typename DensityGridType::NodeType& dn = dg_group(i,j,k);
 
-        if (cell_state == PIC::cs_active)
-        {
-            typename DensityGridType::NodeType& dn = dg_group(i,j,k);
+        // NP for UPx
+        NP = 0.5*(dn.NP + dg_group(i-1,j,k).NP);
+        NP > 1.0e-6 ? dn.UP.x /= NP : dn.UP.x = 0.0;
 
-            // NP for UPx
-            NP = 0.5 * (dn.NP + dg_group(i-1,j,k).NP);
-            NP > 1.0e-6 ? dn.UP.x /= NP : dn.UP.x = 0.0;
+        // NP for UPy
+        NP = 0.5*(dn.NP + dg_group(i,j-1,k).NP);
+        NP > 1.0e-6 ? dn.UP.y /= NP : dn.UP.y = 0.0;
 
-            // NP for UPy
-            NP = 0.5 * (dn.NP + dg_group(i,j-1,k).NP);
-            NP > 1.0e-6 ? dn.UP.y /= NP : dn.UP.y = 0.0;
-
-            //NP for UEz
-            NP = 0.5 * (dn.NP + dg_group(i,j,k-1).NP);
-            NP > 1.0e-6 ? dn.UP.z /= NP : dn.UP.z = 0.0;
-        }
+        // NP for UPz
+        NP = 0.5*(dn.NP + dg_group(i,j,k-1).NP);
+        NP > 1.0e-6 ? dn.UP.z /= NP : dn.UP.z = 0.0;
     }
 }
 
@@ -391,12 +370,7 @@ void normalize_NP(const Grid& grid, DensityGridType& dg_group)
     for (index_t j = 0; j != grid.size_y(); ++j)
     for (index_t k = 0; k != grid.size_z(); ++k)
     {
-        const CellState cell_state = grid(i,j,k).state();
-
-        if (cell_state == cs_active)
-        {
-            dg_group(i,j,k).NP /= cell_volume;
-        }
+        dg_group(i,j,k).NP /= cell_volume;
     }
 }
 
@@ -408,13 +382,13 @@ void local_Alfven_CFL(Grid& grid, size_t i, size_t j, size_t k)
     DblVector vec_to_point(i*h, j*h, k*h);
     DblVector vec_B;
     gather_edge(grid, vec_to_point, &Cell::B, vec_B);
-    const double B = vec_B.length();
+    const double B = vec_B.abs();
 
-    const double mp = ParticleGroups::max_mp() * PIC::Constants::mp();
+    const double mp = ParticleGroups::max_mp()*PIC::Constants::mp();
     const double pi = Constants::pi();
     const double tau_2 = Config::tau_2();
 
-    const double min_dens =  1.5*B*B*tau_2*tau_2/(4*pi*h*h*mp);
+    const double min_dens = 1.5*B*B*tau_2*tau_2/(4*pi*h*h*mp);
     const double cell_volume = grid.cell_volume();
 
     // At this stage grid stores NP*cell_volume
@@ -434,17 +408,18 @@ void backgr_fracture(Grid& grid, size_t i, size_t j, size_t k)
 {
     Cell& cell = grid(i,j,k);
 
-    const double dens_cutoff = PIC::Config::dens_cutoff();
+    const double dens_cutoff = Config::dens_cutoff();
     const double cell_volume = grid.cell_volume();
 
      // At this stage grid stores NP*cell_volume
     if (cell.NP < dens_cutoff*cell_volume)
     {
-        PIC::Config::logger() << "\nbackgr_fracture:"
-                              << "(i,j,k) = (" << i << "," << j << "," << k << ")"
-                              << " cell.NP = " << cell.NP/grid.cell_volume()
-                              << " dens_cutoff = " << dens_cutoff
-                              << std::endl;
+        Config::logger() << "time step = " << Config::current_time_step()
+                         << ": backgr_fracture: "
+                         << "(i,j,k) = (" << i << "," << j << "," << k << ")"
+                         << " cell.NP = " << cell.NP/grid.cell_volume()
+                         << " dens_cutoff = " << dens_cutoff
+                         << std::endl;
 
         cell.NP = dens_cutoff*cell_volume;
     }
@@ -459,39 +434,7 @@ void set_threshold(Grid& grid)
     for (index_t j = 1; j != grid.size_y()-1; ++j)
     for (index_t k = 1; k != grid.size_z()-1; ++k)
     {
-        const CellState cell_state = grid(i,j,k).state();
-
-        if (cell_state == PIC::cs_active)
-        {
-            grid_threshold(grid, i, j, k);
-        }
-    }
-}
-
-template<class GridType>
-void save_grid_node_data(const std::string& prefix, const GridType& grid)
-{
-    using namespace PIC;
-
-    std::string f_name = create_out_file_name(prefix, "grd_nodes_z=4_", PIC::Config::current_time_step());
-    ofstream ofsg(f_name.c_str());
-    //ofsg <<"x\ty\tNP\tUP\tUPx\tUPy\tUPz\tB\tBx\tBy\tBz\tE\tEx\tEy\tEz\n";
-    ofsg <<"x\ty\tNP\tUP\tUPx\tUPy\tUPz\n";
-
-    const size_t k = 4;
-    for(size_t i = 0; i != (grid.size_x()); ++i)  
-    for(size_t j = 0; j != (grid.size_y()); ++j)
-    {
-        const typename GridType::NodeType& c = grid(i,j,k);
-        const double UP = sqrt(c.UP.x*c.UP.x + c.UP.y*c.UP.y + c.UP.z*c.UP.z);
-        //const double B = sqrt(c.Bx*c.Bx + c.By*c.By + c.Bz*c.Bz);
-        //const double E = sqrt(c.Ex*c.Ex + c.Ey*c.Ey + c.Ez*c.Ez);
-        ofsg << i << "\t" << j
-             << "\t" << c.NP
-             << "\t" << UP << "\t"<< c.UP.x << "\t"<< c.UP.y << "\t" << c.UP.z
-            //<< "\t" << B  << "\t"<< c.Bx  << "\t"<< c.By  << "\t" << c.Bz
-            //<< "\t" << E  << "\t"<< c.Ex  << "\t"<< c.Ey  << "\t" << c.Ez
-            << endl;
+        grid_threshold(grid, i, j, k);
     }
 }
 
@@ -499,26 +442,18 @@ void simulate(Grid& grid, Particles& particles)
 {
     std::cout << "\n\nPIC simulation started ...\n\n";
 
+    scatter_particle = &scatter_particle_std;
+
     push_particle = &push_particle_std;
     if (Config::particle_push_alg() == Boris)
-    {
         push_particle = push_particle_boris;
-    }
-
-    std::cout << "\nParticle push algorithm: "
-              << (Config::particle_push_alg() == Direct ? "Direct" :
-                 (Config::particle_push_alg() == Boris ? "Boris" : "Undefined"));
-
-    scatter_particle = &scatter_particle_std;
 
     grid_threshold = &backgr_fracture;
     if (Config::grid_threshold() == Local_CFL)
-    {
         grid_threshold = &local_Alfven_CFL;
-    }
 
     const int max_threads = omp_get_max_threads();
-    densityGrids = vector<DensityGrid>(max_threads,
+    density_grids = vector<DensityGrid>(max_threads,
                                        DensityGrid(grid.size_x(), grid.size_y(), grid.size_z(), grid.step()));
 
     omp_set_dynamic(0); // Explicitly disable dynamic teams
@@ -569,7 +504,7 @@ void simulate(Grid& grid, Particles& particles)
                 // scattered in particles push threads.
                 for (int t = 0; t != max_threads; ++t)
                 {
-                    DensityGrid& dg_thread = densityGrids[t];
+                    DensityGrid& dg_thread = density_grids[t];
                     dg_group.add_current(dg_thread);
                     dg_thread.reset_current();
                 }
@@ -588,9 +523,6 @@ void simulate(Grid& grid, Particles& particles)
                 // save group grid data.
                 print_tm("Save grid data: ", group_name);
                 save_grid(grid, dg_group, group_name);
-
-                //save_grid_node_data(group_name, dg_group);
-
             } // for (size_t g = 0; g!= group_names.size(); ++g)
         }
         else
@@ -606,7 +538,7 @@ void simulate(Grid& grid, Particles& particles)
             // scattered in particles push threads.
             for (int t = 0; t != max_threads; ++t)
             {
-                DensityGrid& dg = densityGrids[t];
+                DensityGrid& dg = density_grids[t];
                 grid.add_current(dg);
                 dg.reset_current();
             }
@@ -630,8 +562,6 @@ void simulate(Grid& grid, Particles& particles)
 
             print_tm("Save grid data: ", ParticleGroups::all_particles_name);
             save_grid(grid, grid, ParticleGroups::all_particles_name);
-
-            //save_grid_node_data(ParticleGroups::all_particles_name, grid);
         }
 
         // move all particle on full time step

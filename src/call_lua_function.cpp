@@ -1,12 +1,10 @@
-#include <boost/format.hpp>
-
+#include "call_lua_function.h"
 #include "config.h"
 #include "use_lua.h"
 #include "io_utilities.h"
 #include "particles.h"
 
-#include "call_lua_function.h"
-
+#include <boost/format.hpp>
 
 bool call_lua_function(const char* func_name)
 {
@@ -18,7 +16,12 @@ bool call_lua_function(const char* func_name)
     {
         luabind::call_function<void>(lua, func_name);
     }
-    catch (std::exception& /*e*/)
+    catch(std::exception& e)
+    {
+        print(e.what());
+        ok = false;
+    }    
+    catch(...)
     {
         std::string msg_fmt = "Function \"%s\" not defined or invalid in \"%s\".";
         std::string msg = str(boost::format(msg_fmt) % func_name % PIC::Config::cfg_script_name());
@@ -29,7 +32,7 @@ bool call_lua_function(const char* func_name)
     return ok;
 }
 
-bool lua_validate_particle(Particle& particle)
+bool lua_validate_particle(const Particle& particle)
 {
     UseLua lua;
 

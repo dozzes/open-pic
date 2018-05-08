@@ -1,9 +1,7 @@
-#include <algorithm>
-
+#include "marker_particles.h"
 #include "opic_fwd.h"
 
-#include "marker_particles.h"
-
+#include <algorithm>
 
 using namespace PIC;
 using namespace std;
@@ -16,9 +14,7 @@ void MarkerParticles::insert_idx(const string& name, index_t particle_idx)
 {
     deque<index_t>& seq_idx = markers_[name];
     if (find(seq_idx.begin(), seq_idx.end(), particle_idx) == seq_idx.end())
-    {
         seq_idx.push_back(particle_idx);
-    }
 }
 
 void MarkerParticles::remove_idx(index_t idx)
@@ -34,9 +30,7 @@ void MarkerParticles::remove_idx(index_t idx)
         for (index_t i = 0; i != seq_idx.size(); ++i)
         {
             if (seq_idx[i] > idx)
-            {
                 --seq_idx[i];
-            }
         }
     }
 }

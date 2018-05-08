@@ -1,13 +1,11 @@
-#if !defined (MARKER_PARTICLES_H)
-#define MARKER_PARTICLES_H
-
-#include <string>
-#include <map>
-#include <deque>
+#pragma once
 
 #include "opic_fwd.h"
 #include "diagnostics.h"
 
+#include <string>
+#include <map>
+#include <deque>
 
 class MarkerParticles
 {
@@ -36,5 +34,3 @@ private:
     static MapNameToMarkers markers_;
     static PIC::Diagnostics diag_;
 };
-
-#endif // MARKER_PARTICLES_H

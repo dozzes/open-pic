@@ -1,17 +1,14 @@
-#if !defined (CHECK_PARTICLE_H)
-#define CHECK_PARTICLE_H
+#pragma once
 
 #include "opic_fwd.h"
 
-
-/**********************************************************
-* Validate particle.                                      *
-* If particle is not active set it absorbed.              *
-* Equation of motion is solved for active particles only. *
-* Return true if particles is active, otherwise - false   *
+/*********************************************************
+* Check if particle is active.                           *
+* equation of motion is solved for active particles only *
+* return true if particles is active, otherwise - false  *
 *********************************************************/
-bool validate_particle(Particle& particle, const Grid& grid);
+bool is_particle_can_scatter(Particles& particles, index_t p, const Grid& grid, const DblVector& dr);
+bool is_particle_can_move(Particles& particles, index_t p, const Grid& grid);
 
-bool check_particle_move(Particle& particle, const Grid& grid, const DblVector& dr);
-
-#endif // CHECK_PARTICLE_H
+// Check if particle will be move less thne h/2.
+bool check_particle_move(const Particle& particle, const Grid& grid, const DblVector& dr);

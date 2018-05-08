@@ -1,15 +1,12 @@
-#if !defined (GRID_H)
-#define GRID_H
-
-#include <vector>
-#include <stdexcept>
-#include <iosfwd>
-
-#include <boost/format.hpp>
+#pragma once
 
 #include "config.h"
 #include "vector_3d.h"
 
+#include <boost/format.hpp>
+#include <vector>
+#include <stdexcept>
+#include <iosfwd>
 
 namespace PIC {
 
@@ -54,9 +51,7 @@ struct Cell
     Cell& operator=(const Cell& rhs)
     {
        if ((void*)this == (void*)&rhs)
-       {
           return *this;
-       }
 
        NP = rhs.NP;
        B = rhs.B;
@@ -64,13 +59,13 @@ struct Cell
        UE = rhs.UE;
        UP = rhs.UP;
        state_ = rhs.state();
- 
+
        return *this;
     }
 
     void set_state(PIC::CellState new_state) { state_ = new_state; }
-    PIC::CellState state() const { return (PIC::Config::current_time_step() == 0 ?  PIC::cs_active : state_); }
- 
+    PIC::CellState state() const { return state_; }
+
     double NP;    // ions density (cm^-3)
     DblVector B;  // magnetic field
     DblVector E;  // electric field
@@ -106,9 +101,7 @@ public:
     GridContainer<NodeT>& operator=(const GridContainer<NodeT>& rhs)
     {
         if ((void*)this == (void*)&rhs)
-        {
             return *this;
-        }
 
         size_x_ = rhs.size_x();
         size_y_ = rhs.size_y();
@@ -125,13 +118,10 @@ public:
         {
             NodeT& node = data_[i];
 
-            //TODO:if (node.state() == PIC::cs_active)
-            {
-                node.NP = 0.0;
-                node.UP.x = 0.0;
-                node.UP.y = 0.0;
-                node.UP.z = 0.0;
-            }
+            node.NP = 0.0;
+            node.UP.x = 0.0;
+            node.UP.y = 0.0;
+            node.UP.z = 0.0;
         }
     }
 
@@ -181,7 +171,7 @@ public:
         size_y_ = new_size_y;
         size_z_ = new_size_z;
 
-        data_.resize(size_x_ * size_y_* size_z_);
+        data_.resize(size_x_*size_y_*size_z_);
     }
 
     void set_boundary_state(PIC::CellState new_state) //TODO: improve 3d matrix bound traversal
@@ -202,15 +192,15 @@ public:
     void set_step(double h) { h_ = h; }
     double step() const     { return h_; }
 
-    double cell_volume() const { return (h_ * h_ * h_);}
+    double cell_volume() const { return (h_*h_*h_);}
 
     index_t size_x() const { return size_x_; }
     index_t size_y() const { return size_y_; }
     index_t size_z() const { return size_z_; }
 
-    double length_x() const { return ((size_x_ - 1) * h_); }
-    double length_y() const { return ((size_y_ - 1) * h_); }
-    double length_z() const { return ((size_z_ - 1) * h_); }
+    double length_x() const { return ((size_x_ - 1)*h_); }
+    double length_y() const { return ((size_y_ - 1)*h_); }
+    double length_z() const { return ((size_z_ - 1)*h_); }
 
 private:
     index_t size_x_;
@@ -238,5 +228,3 @@ bool operator!=(const GridContainer<NodeT>& g1, const GridContainer<NodeT>& g2)
 }
 
 typedef GridContainer<Cell> Grid;
-
-#endif // GRID_H

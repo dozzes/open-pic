@@ -1,5 +1,4 @@
-#ifndef OPENPIC_MSVC_H
-#define OPENPIC_MSVC_H
+#pragma once
 
 #define WIN32_LEAN_AND_MEAN
 
@@ -44,10 +43,3 @@
                 #define __EXCEPTION_TRACER__
         #endif
 #endif
-
-#pragma warning(disable:4250) // 'class1' : inherits 'class2::member' via dominance
-#pragma warning(disable:4786) // msvc too long debug names in stl
-#pragma warning(disable:4244) // 'argument' : conversion from 'type1' to 'type2', possible loss of data
-#pragma warning(disable:4267) // 'var' : conversion from 'size_t' to 'type', possible loss of data
-
-#endif // OPENPIC_MSVC_H

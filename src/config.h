@@ -1,18 +1,17 @@
-#if !defined (CONFIG_H)
-#define CONFIG_H
-
-#include <string>
-#include <iosfwd>
+#pragma once
 
 #include "opic_fwd.h"
 #include "constants.h"
 
+#include <string>
+#include <iosfwd>
 
 namespace PIC {
 
 using namespace std;
 
 enum ParticlePushAlg { Direct = 0, Boris};
+enum ScatterAlg { Standard = 0, Zigzag };
 enum GridThreshold { Min_Density = 0, Local_CFL};
 enum CFLSeverity { Ignore, Absorb, Stop};
 
@@ -49,6 +48,7 @@ public:
                    double E_scale_,
                    double B_scale_,
                    ParticlePushAlg particl_push_alg_,
+                   ScatterAlg scatter_alg_,
                    GridThreshold grid_threshold_,
                    CFLSeverity CFL_severity_);
 
@@ -87,24 +87,26 @@ public:
         double B_scale;
 
         ParticlePushAlg particle_push_alg;
+        ScatterAlg scatter_alg;
         GridThreshold grid_threshold;
         CFLSeverity CFL_severity;
     };
 
     static const string& cfg_script_name() { return params.cfg_script_name; }
 
-    static void set_tau(double tau); // tau
+    static void set_tau(double tau);
     static double tau() { return params.tau; }
-    static double h()   { return params.h; } // h
+    static double h()   { return params.h; }
+    static double h_2() { return 0.5*h(); }
     static void set_dens_cutoff(double dens_cutoff); // min density (NP)
     static double dens_cutoff() { return params.dens_cutoff; }
 
-    static double tau_2()     { return (0.5 * tau()); } // tau/2
-    static double tau_2h()    { return (tau_2()/h()); } // tau/(2*h)
-    static double ctau_2()    { return (0.5 * Constants::c()*tau()); } // c*tau/2
-    static double ctau_h()    { return (Constants::c()*tau()/h()); } // c*tau/h
-    static double ctau_2h()   { return (0.5 * ctau_h());} // c*tau_/(2*h)
-    static double c_4pi_e_h() { return (Constants::c_4pi_e()/h()); } // c/(4*pi*e*h)
+    static double tau_2()     { return (0.5*tau()); }
+    static double tau_2h()    { return (tau_2()/h()); }
+    static double ctau_2()    { return (0.5*Constants::c()*tau()); }
+    static double ctau_h()    { return (Constants::c()*tau()/h()); }
+    static double ctau_2h()   { return (0.5*ctau_h());}
+    static double c_4pi_e_h() { return (Constants::c_4pi_e()/h()); }
 
     static index_t grid_size_x() { return params.grid_size_x; }
     static index_t grid_size_y() { return params.grid_size_y; }
@@ -146,6 +148,9 @@ public:
     static void set_particle_push_alg(ParticlePushAlg alg) { params.particle_push_alg = alg; }
     static ParticlePushAlg particle_push_alg() { return params.particle_push_alg; }
 
+    static void set_scatter_alg(ScatterAlg alg) { params.scatter_alg = alg; }
+    static ScatterAlg scatter_alg() { return params.scatter_alg; }
+
     static void set_grid_threshold(GridThreshold gt) { params.grid_threshold = gt; }
     static GridThreshold grid_threshold() { return params.grid_threshold; }
 
@@ -166,5 +171,3 @@ private:
 ostream& operator<<(ostream& out, const Config::Parameters& params);
 
 } // namespace PIC
-
-#endif // CONFIG_H

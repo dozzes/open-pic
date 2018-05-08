@@ -1,10 +1,9 @@
+#include "config.h"
+
 #include <ostream>
 #include <fstream>
 #include <stdexcept>
 #include <functional>
-
-#include "config.h"
-
 
 // static
 PIC::Config::Parameters PIC::Config::params = Config::Parameters();
@@ -15,17 +14,13 @@ static std::ofstream out("opic_trace.log");
 
 void check_if_positive(const std::string& msg, double val)
 {
-    if (val < 0.0)
-    {
-        throw std::invalid_argument(msg);
-    }
+    if (val < 0.0) throw std::invalid_argument(msg);
 }
 
 } // unnamed namespace
 
 // static
 std::ofstream& PIC::Config::ofs_log = out;
-
 
 void PIC::Config::set_dens_cutoff(double dens_cutoff)
 {
@@ -105,6 +100,7 @@ PIC::Config::Parameters::Parameters()
   E_scale(1.0),
   B_scale(1.0),
   particle_push_alg(Direct),
+  scatter_alg(Standard),
   grid_threshold(Min_Density),
   CFL_severity(Stop)
 {
@@ -132,6 +128,7 @@ PIC::Config::Parameters::Parameters(const std::string& cfg_script_name_,
                                     double E_scale_,
                                     double B_scale_,
                                     ParticlePushAlg particle_push_alg_,
+                                    ScatterAlg scatter_alg_,
                                     GridThreshold grid_threshold_,
                                     CFLSeverity CFL_severity_)
 : cfg_script_name(cfg_script_name_),
@@ -157,6 +154,7 @@ PIC::Config::Parameters::Parameters(const std::string& cfg_script_name_,
   E_scale(E_scale_),
   B_scale(B_scale_),
   particle_push_alg(particle_push_alg_),
+  scatter_alg(scatter_alg_),
   grid_threshold(grid_threshold_),
   CFL_severity(CFL_severity_)
 {
@@ -165,7 +163,9 @@ PIC::Config::Parameters::Parameters(const std::string& cfg_script_name_,
 
 bool PIC::Config::Parameters::is_valid() const
 {
-    return (h > 0.0 && tau > 0.0 && dens_cutoff > 0.0 &&
+    const bool is_density_threshold_valid = (grid_threshold == Min_Density ) ? (dens_cutoff > 0.0) : true;
+
+    return (h > 0.0 && tau > 0.0 && is_density_threshold_valid &&
             time_steps > 0 && save_time_steps > 0 &&
             grid_size_x > 0 && grid_size_y > 0 && grid_size_z > 0 &&
             L_scale > 0.0 &&
@@ -184,10 +184,10 @@ bool PIC::Config::is_on_save_step()
 
 void PIC::Config::set_os_name()
 {
-#ifdef _WIN32
-    params.os_name = "Windows 32-bit";
-#elif _WIN64
+#ifdef _WIN64
     params.os_name = "Windows 64-bit";
+#elif _WIN32
+    params.os_name = "Windows 32-bit";
 #elif __unix || __unix__
     params.os_name = "Unix";
 #elif __APPLE__ || __MACH__
@@ -231,11 +231,16 @@ ostream& operator<<(ostream& os, const Config::Parameters& params)
        << "\nprocess_rank = " << params.process_rank
        << "\nalgorithm of solving particle motion equation = "
        << (params.particle_push_alg == Direct ? "Direct" :
-          (params.particle_push_alg == Boris ? "Boris" : "Undefined"))
+           params.particle_push_alg == Boris ? "Boris" : "Undefined")
+       << "\nalgorithm of scatter particles to grid = "
+       << (params.scatter_alg == Standard ? "Standard" :
+           params.scatter_alg == Zigzag ? "Zigzag" : "Undefined")
        << "\ngrid threshold type = "
        << (params.grid_threshold == Min_Density ? "Min_Density" :
-          (params.grid_threshold == Local_CFL ? "Local_CFL" : "Undefined"))
-       << "\nCFL_severity = " << params.CFL_severity
+           params.grid_threshold == Local_CFL ? "Local_CFL" : "Undefined")
+       << "\nCFL_severity = " << (params.CFL_severity == Ignore ? "Ignore" :
+                                  params.CFL_severity == Absorb ? "Absorb" :
+                                  params.CFL_severity == Stop ? "Stop" : "Undefined")
        << "\nConstants:"
        << "\nc = " << Constants::c()
        << "\ne = " << Constants::e()

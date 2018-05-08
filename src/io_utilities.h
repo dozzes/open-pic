@@ -1,16 +1,14 @@
-#if !defined (IO_UTILTIIES_H)
-#define IO_UTILTIIES_H
+#pragma once
 
+#include "config.h"
+
+#include <boost/lexical_cast.hpp>
 #include <omp.h>
 #include <string>
 #include <iostream>
 #include <fstream>
 #include <iomanip>
 #include <cstdio>
-#include <boost/lexical_cast.hpp>
-
-#include "config.h"
-
 
 /************************************************************************/
 /* print program header: description, version and contacts              */
@@ -88,6 +86,3 @@ void log(const MsgT& msg, bool duplicate_on_stdout = true)
         print(msg);
     }
 }
-
-#endif // IO_UTILTIIES_H
-

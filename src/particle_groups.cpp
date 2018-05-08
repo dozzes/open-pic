@@ -1,15 +1,12 @@
+#include "particle_groups.h"
+#include "opic_fwd.h"
+
+#include <boost/format.hpp>
 #include <iostream>
 #include <limits>
 #include <algorithm>
 #include <stdexcept>
-#include <limits> 
-
-#include <boost/format.hpp>
-
-#include "opic_fwd.h"
-
-#include "particle_groups.h"
-
+#include <limits>
 
 using namespace PIC;
 using namespace std;
@@ -38,9 +35,7 @@ bool ParticleGroups::create_group(const string& name, double charge, double mass
         ParticleGroup pg(name, charge, mass, diag);
 
         if (mass > max_mp_)
-        {
             max_mp_ = mass;
-        }
 
         return groups_.insert(make_pair(name, pg)).second;
     }
@@ -61,9 +56,7 @@ ParticleGroups::group_names() const
 
     MapNameToGroup::const_iterator it = begin();
     for (; it != end(); ++it)
-    {
         names.push_back(it->first);
-    }
 
     return names;
 }

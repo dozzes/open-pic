@@ -1,11 +1,10 @@
-#if !defined (GRID_FILTERS_H)
-#define GRID_FILTERS_H
-
-#include <string>
+#pragma once
 
 #include "opic_fwd.h"
 #include "vector_3d.h"
 
+#include <string>
+#include <vector>
 
 typedef Vector3D<double> DblVector;
 
@@ -34,7 +33,7 @@ public:
     std::string& at(index_t i)                      { return filters_.at(i); }
     void append(const std::string& filter_name)     { filters_.push_back(filter_name); }
     void resize(index_t newsize)                    { filters_.resize(newsize); }
-    index_t size()                                  { return filters_.size(); }
+    size_t size()                                   { return filters_.size(); }
     const std::vector<std::string>& filter_names()  { return filters_; }
 
 private:
@@ -62,5 +61,3 @@ private:
     index_t level_;
     static const std::string plain_tags_;
 };
-
-#endif // GRID_FILTERS_H

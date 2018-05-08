@@ -1,6 +1,4 @@
-#if !defined (DIAGNOSTICS_H)
-#define DIAGNOSTICS_H
-
+#pragma once
 
 namespace PIC {
 
@@ -13,5 +11,3 @@ enum Diagnostics
 };
 
 } // namespace PIC
-
-#endif // DIAGNOSTICS_H

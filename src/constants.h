@@ -1,6 +1,4 @@
-#if !defined (CONSTANTS_H)
-#define CONSTANTS_H
-
+#pragma once
 
 namespace PIC {
 
@@ -19,5 +17,3 @@ public:
 };
 
 } // namespace PIC
-
-#endif //CONSTANTS_H

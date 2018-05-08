@@ -1,21 +1,19 @@
-#include <string>
-#include <iostream>
-#include <stdexcept>
-
+#include "bind_to_lua.h"
 #include "config.h"
 #include "use_lua.h"
 #include "gather_scatter.h"
 #include "grid.h"
 #include "grid_filters.h"
-#include <boost/format.hpp>
-#include <luabind/operator.hpp>
-
 #include "particles.h"
 #include "particle_groups.h"
 #include "marker_particles.h"
+#include "save_grid.h"
 
-#include "bind_to_lua.h"
-
+#include <luabind/operator.hpp>
+#include <boost/format.hpp>
+#include <string>
+#include <iostream>
+#include <stdexcept>
 
 namespace {
 
@@ -58,7 +56,6 @@ int luabind_error_handler(lua_State* lua)
 
 } // unnamed namespace
 
-
 // bind PIC objects to Lua
 bool bind_to_lua(const char* lua_cfg_file_name, Grid& grid, Particles& particles)
 {
@@ -74,16 +71,18 @@ bool bind_to_lua(const char* lua_cfg_file_name, Grid& grid, Particles& particles
         // bind gather function from_grid_to_point as "pic_gather"
         def("pic_gather", (void(*)(const Grid&, const DblVector&, Grid::NodeType&)) &from_grid_to_point),
 
+        // bind save function from_grid_to_point as "pic_gather"
+        def("pic_save_grid_node", (void(*)(const std::string& prefix, const Grid& grid)) &save_grid_node),
+
         // bind DblVector
         class_<DblVector>("DblVector")
             .def(constructor<>())
             .def(constructor<const DblVector&>())
             .def(constructor<double /* x */, double /* y */, double /* z */>())
-            .property("x", &DblVector::x, &DblVector::set_x)
-            .property("y", &DblVector::y, &DblVector::set_y)
-            .property("z", &DblVector::z, &DblVector::set_z)
-            .def("length", &DblVector::length)
-            .def("abs", &DblVector::length),
+            .property("x", &DblVector::get_x, &DblVector::set_x)
+            .property("y", &DblVector::get_y, &DblVector::set_y)
+            .property("z", &DblVector::get_z, &DblVector::set_z)
+            .def("abs", &DblVector::abs),
 
         // bind Cell
         class_<Cell>("Cell")
@@ -229,8 +228,14 @@ bool bind_to_lua(const char* lua_cfg_file_name, Grid& grid, Particles& particles
                 value("Direct", Direct),
                 value("Boris", Boris)
             ]
-
             .def_readwrite("push_method", &Config::Parameters::particle_push_alg)
+
+            .enum_("Scatter_Method")
+            [
+                value("Standard", Standard),
+                value("Zigzag", Zigzag)
+            ]
+            .def_readwrite("scatter_method", &Config::Parameters::scatter_alg)
 
             .enum_("Grid_Threshold")
             [
@@ -239,6 +244,7 @@ bool bind_to_lua(const char* lua_cfg_file_name, Grid& grid, Particles& particles
             ]
 
             .def_readwrite("grid_threshold", &Config::Parameters::grid_threshold)
+            .def_readwrite("density_threshold", &Config::Parameters::grid_threshold)
 
             .enum_("CFL_Severity")
             [

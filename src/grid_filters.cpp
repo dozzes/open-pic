@@ -1,16 +1,13 @@
-#include <cmath>
-#include <iostream>
-#include <stdexcept>
-
+#include "grid_filters.h"
+#include "config.h"
 #include "use_lua.h"
 #include "io_utilities.h"
-#include "config.h"
 
 #include <boost/ref.hpp>
 #include <boost/format.hpp>
-
-#include "grid_filters.h"
-
+#include <cmath>
+#include <iostream>
+#include <stdexcept>
 
 using namespace std;
 

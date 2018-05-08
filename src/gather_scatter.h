@@ -1,5 +1,5 @@
 /*
-Full-integer grids [F] at i*h, j*h, k*h (i = 1, 2, ...,Nx, j = 1, 2, ...,Ny, k = 1, 2, ...,Nz)
+Full-integer grids [F] at i*h, j*h, k*h (i = 1..Nx, j = 1..Ny, k = 1..Nz)
 and half-integer grids [H] at (i + 1/2)*h, (j + 1/2)*h, (k + 1/2)*h.
 (i,j,k) is labeled [FFF].
 (i+1/2,j+1/2,k+1/2) is labeled [HHH].
@@ -10,15 +10,13 @@ Jx, Jy, Jz are defined at [HFF], [FHF], [FFH]. Face centered
 Bx, By, Bz are defined at [FHH], [HFH], [HHF]. Edge centered
 */
 
-#if !defined (GATHER_SCATTER_H)
-#define GATHER_SCATTER_H
-
-#include <vector>
-#include <string>
+#pragma once
 
 #include "grid.h"
 #include "particles.h"
 
+#include <vector>
+#include <string>
 
 namespace PIC {
 
@@ -66,9 +64,9 @@ void gather_face(const Grid& grid,
 
 /*****************************************************************************
 * Gather cell-centered value.                                                *
-*    at_point - specified position                                           *
-*    val - Pointer to cell member required                                   *
-*    ret_val - result gathered value                                         *
+*   at_point - specified position                                            *
+*   val - Pointer to cell member required                                    *
+*   ret_val - result gathered value                                          *
 * Used to interpolate density NP values for specified position.              *
 *                                                                            *
 *****************************************************************************/
@@ -168,13 +166,13 @@ double gather_vector(const GridT& grid,
 
     double ret_val = 0.0;
 
-    for (size_t i = pi; i != pi+2; ++i)
-    for (size_t j = pj; j != pj+2; ++j)
-    for (size_t k = pk; k != pk+2; ++k)
+    for (index_t i = pi; i != pi+2; ++i)
+    for (index_t j = pj; j != pj+2; ++j)
+    for (index_t k = pk; k != pk+2; ++k)
     {
-        ret_val += (grid(i,j,k).*vec.*comp) * R((i + Centering::x())*h - at_point.x,
-                                                (j + Centering::y())*h - at_point.y,
-                                                (k + Centering::z())*h - at_point.z, h);
+        ret_val += (grid(i,j,k).*vec.*comp)*R((i + Centering::x())*h - at_point.x,
+                                              (j + Centering::y())*h - at_point.y,
+                                              (k + Centering::z())*h - at_point.z, h);
     }
 
     return ret_val;
@@ -214,13 +212,13 @@ double gather_scalar(const GridT& grid,
 
     double ret_val = 0.0;
 
-    for (size_t i = pi; i != pi+2; ++i)
-    for (size_t j = pj; j != pj+2; ++j)
-    for (size_t k = pk; k != pk+2; ++k)
+    for (index_t i = pi; i != pi+2; ++i)
+    for (index_t j = pj; j != pj+2; ++j)
+    for (index_t k = pk; k != pk+2; ++k)
     {
-        ret_val += (grid(i,j,k).*val) * R((i + Centering::x())*h - at_point.x,
-                                          (j + Centering::y())*h - at_point.y,
-                                          (k + Centering::z())*h - at_point.z, h);
+        ret_val += (grid(i,j,k).*val)*R((i + Centering::x())*h - at_point.x,
+                                        (j + Centering::y())*h - at_point.y,
+                                        (k + Centering::z())*h - at_point.z, h);
     }
 
     return ret_val;
@@ -228,7 +226,8 @@ double gather_scalar(const GridT& grid,
 
 typedef GridContainer<Density> DensityGrid;
 
-void scatter_particle_std(const Particle& p, DensityGrid& dg);
+void scatter_particle_std(const Particle& particlep, DensityGrid& grid, const DblVector& dr);
+void scatter_particle_zigzag(const Particle& particle, DensityGrid& grid, const DblVector& dr);
 
 /***************************************************************************
 * Set boundary conditions                                                  *
@@ -238,5 +237,3 @@ void set_boundary_conditions(const std::string& lua_func_name);
 void set_boundary_conditions(const std::string& lua_func_name, DensityGrid& dg);
 
 } // namespace PIC
-
-#endif // GATHER_SCATTER_H

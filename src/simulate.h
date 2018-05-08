@@ -1,10 +1,8 @@
-#if !defined (SIMULATE_H)
-#define SIMULATE_H
-
-#include <boost/function.hpp>
+#pragma once
 
 #include "opic_fwd.h"
 
+#include <boost/function.hpp>
 
 namespace PIC {
 
@@ -24,8 +22,7 @@ void calc_magnetic_field_half_time(Grid& grid);
 * Move particles in half time step (m+1/2) *
 *                                          *
 *******************************************/
-void move_particles_half_time(const Grid& grid,
-                              Particles& particles,
+void move_particles_half_time(const Grid& grid, Particles& particles,
                               const std::string& group_name);
 
 /************************************************************
@@ -44,8 +41,7 @@ void move_particles_half_time(const Grid& grid,
 * Move particles in full time step *
 *                                  *
 ***********************************/
-void move_particles_full_time(const Grid& grid,
-                              Particles& particles,
+void move_particles_full_time(const Grid& grid, Particles& particles,
                               const std::string& group_name);
 
 /***************************************************
@@ -86,5 +82,3 @@ void calcEnergy(const Grid& grid, const Particles& particles);
 void simulate(Grid& grid, Particles& particles);
 
 } // namespace PIC
-
-#endif // SIMULATE_H
