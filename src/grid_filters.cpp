@@ -16,7 +16,6 @@ vector<string> UserGridFilters::filters_ = vector<string>();
 
 UserGridFilter::UserGridFilter(const string& name) : GridFilter(name)
 {
-
 }
 
 bool UserGridFilter::operator()(const DblVector& node, const DblVector& pos) const

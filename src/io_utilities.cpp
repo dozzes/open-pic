@@ -21,7 +21,7 @@ void print_header()
             "  Institute of Radiophysics and Electronics NAS RA.   \n"
             "                    www.irphe.am                      \n"
             "                                                      \n"
-            "  version 1.2 08/22/2007.        osipyan@gmail.com    \n"
+            "  version 2.0 05/08/2018         osipyan@gmail.com    \n"
             "======================================================\n"
             "\n";
 }

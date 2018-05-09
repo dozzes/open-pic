@@ -13,7 +13,6 @@
 Particles::Particles()
 : indexes_to_remove_(omp_get_max_threads())
 {
-
 }
 
 index_t Particles::size() const

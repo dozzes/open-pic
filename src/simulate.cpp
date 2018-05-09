@@ -138,7 +138,8 @@ namespace {
 void log_error(const char* msg)
 {
     const int tid = omp_get_thread_num();
-    const std::string log_file_name = str(boost::format("opic_thread_%1%_move_particles_half_time_err.log") % tid);
+    const std::string log_file_name =
+        str(boost::format("opic_thread_%1%_move_particles_half_time_err.log") % tid);
     std::ofstream ofs_log(log_file_name.c_str(), std::ios_base::app);
     ofs_log << msg << std::endl;
 };
@@ -160,7 +161,8 @@ void move_particles_half_time(const Grid& grid, Particles& particles, const std:
         {
             Particle& particle = particles[p];
 
-            if ((group_name == ParticleGroups::all_particles_name || group_name == particle.group_name) &&
+            if ((group_name == ParticleGroups::all_particles_name ||
+                 group_name == particle.group_name) &&
                 (err_count == 0))
             {
                 if (is_particle_can_move(particles, p, grid))
@@ -205,9 +207,8 @@ void move_particles_half_time(const Grid& grid, Particles& particles, const std:
 * Move particles in full time step *
 *                                  *
 ***********************************/
-void move_particles_full_time(const Grid& grid,
-                              Particles& particles,
-                              const std::string& group_name) // m+1
+void move_particles_full_time(const Grid& grid, Particles& particles,
+                              const std::string& group_name) // step m+1
 {
     const double tau_2 = Config::tau_2();
     const long particles_num = particles.size();
@@ -374,7 +375,7 @@ void normalize_NP(const Grid& grid, DensityGridType& dg_group)
     }
 }
 
-void local_Alfven_CFL(Grid& grid, size_t i, size_t j, size_t k)
+void local_Alfven_CFL(Grid& grid, index_t i, index_t j, index_t k)
 {
     Cell& cell = grid(i,j,k);
 
@@ -404,7 +405,7 @@ void local_Alfven_CFL(Grid& grid, size_t i, size_t j, size_t k)
     }
 }
 
-void backgr_fracture(Grid& grid, size_t i, size_t j, size_t k)
+void backgr_fracture(Grid& grid, index_t i, index_t j, index_t k)
 {
     Cell& cell = grid(i,j,k);
 
@@ -425,7 +426,7 @@ void backgr_fracture(Grid& grid, size_t i, size_t j, size_t k)
     }
 }
 
-void (*grid_threshold)(Grid& grid, size_t i, size_t j, size_t k);
+void (*grid_threshold)(Grid& grid, index_t i, index_t j, index_t k);
 
 void set_threshold(Grid& grid)
 {

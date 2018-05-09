@@ -71,11 +71,6 @@ void calc_electrons_velocity(Grid& grid);
 ***************************************************/
 void calc_electric_field(Grid& grid);
 
-/***************************************************
-* Calculate particles kinetic energy               *
-***************************************************/
-void calcEnergy(const Grid& grid, const Particles& particles);
-
 /**************************************************
 * Simulation cycle                                *
 **************************************************/

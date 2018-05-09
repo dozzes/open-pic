@@ -44,10 +44,8 @@ typedef double (DblVector::*VectorComp);
 *    ret_vec - result gathered value                                         *
 * Used to interpolate Bx, By, Bz for specified position                      *
 *****************************************************************************/
-void gather_edge(const Grid& grid,
-                 const DblVector& at_point,
-                 CellVectorValue val,
-                 DblVector& ret_vec);
+void gather_edge(const Grid& grid, const DblVector& at_point,
+                 CellVectorValue val, DblVector& ret_vec);
 
 /*****************************************************************************
 * Gather face-centered values: Ex, Ey, Ez, UPx, UPy, UPz, UEx, UEy, UEz      *
@@ -57,10 +55,8 @@ void gather_edge(const Grid& grid,
 * Used to interpolate Ex, Ey, Ez, UPx, UPy, UPz, UEx, UEy, UEz values        *
 * for specified position.                                                    *
 *****************************************************************************/
-void gather_face(const Grid& grid,
-                 const DblVector& at_point,
-                 CellVectorValue val,
-                 DblVector& ret_vec);
+void gather_face(const Grid& grid, const DblVector& at_point,
+                 CellVectorValue val, DblVector& ret_vec);
 
 /*****************************************************************************
 * Gather cell-centered value.                                                *
@@ -70,22 +66,19 @@ void gather_face(const Grid& grid,
 * Used to interpolate density NP values for specified position.              *
 *                                                                            *
 *****************************************************************************/
-double gather_center(const Grid& grid,
-                     const DblVector& at_point,
+double gather_center(const Grid& grid, const DblVector& at_point,
                      CellScalarValue val);
 
 /***************************************************************************
 * interpolates grid values to specified point <vec_to_point>               *
 ***************************************************************************/
-void from_grid_to_point(const Grid& grid,
-                        const DblVector& vec_to_point,
+void from_grid_to_point(const Grid& grid, const DblVector& vec_to_point,
                         Grid::NodeType& val_at_point);
 
 /***************************************************************************
 * interpolates grid values to specified point (x,y,z)                      *
 ***************************************************************************/
-void from_grid_to_point(const Grid& grid,
-                        double x, double y, double z,
+void from_grid_to_point(const Grid& grid, double x, double y, double z,
                         Grid::NodeType& val_at_point);
 
 struct FaceXCentering
@@ -152,10 +145,8 @@ struct Density
 };
 
 template<class Centering, class GridT>
-double gather_vector(const GridT& grid,
-                     const DblVector& at_point,
-                     DblVector GridT::NodeType::* vec,
-                     double DblVector::* comp)
+double gather_vector(const GridT& grid, const DblVector& at_point,
+                     DblVector GridT::NodeType::* vec, double DblVector::* comp)
 {
     const double h = grid.step();
 
@@ -179,19 +170,15 @@ double gather_vector(const GridT& grid,
 }
 
 template<class Centering, class GridT>
-double gather_vector(const GridT& grid,
-                     double x, double y, double z,
-                     DblVector GridT::NodeType::* vec,
-                     double DblVector::* comp)
+double gather_vector(const GridT& grid, double x, double y, double z,
+                     DblVector GridT::NodeType::* vec, double DblVector::* comp)
 {
     return gather_vector<Centering>(grid, DblVector(x, y, z), vec, comp);
 }
 
 template<class GridT>
-void gather_face(const GridT& grid,
-                 const DblVector& at_point,
-                 DblVector GridT::NodeType::* val,
-                 DblVector& ret_vec)
+void gather_face(const GridT& grid, const DblVector& at_point,
+                 DblVector GridT::NodeType::* val, DblVector& ret_vec)
 {
     ret_vec.x = gather_vector<PIC::FaceXCentering>(grid, at_point, val, &DblVector::x);
     ret_vec.y = gather_vector<PIC::FaceYCentering>(grid, at_point, val, &DblVector::y);
@@ -199,8 +186,7 @@ void gather_face(const GridT& grid,
 }
 
 template<class Centering, class GridT>
-double gather_scalar(const GridT& grid,
-                     const DblVector& at_point,
+double gather_scalar(const GridT& grid, const DblVector& at_point,
                      double GridT::NodeType::* val)
 {
     const double h = grid.step();
@@ -233,7 +219,6 @@ void scatter_particle_zigzag(const Particle& particle, DensityGrid& grid, const 
 * Set boundary conditions                                                  *
 ***************************************************************************/
 void set_boundary_conditions(const std::string& lua_func_name);
-
 void set_boundary_conditions(const std::string& lua_func_name, DensityGrid& dg);
 
 } // namespace PIC

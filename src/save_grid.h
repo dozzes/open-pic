@@ -105,10 +105,8 @@ void save_subgrid(const GridT& grid, const DensGridT& dens_grid, const PointFilt
 }
 
 template<class GridT, class DensGridT>
-void save_grid_levels(const GridT& grid,
-                      const DensGridT& dens_grid,
-                      PlainFilter& plain_filter,
-                      index_t from_level, index_t to_level)
+void save_grid_levels(const GridT& grid, const DensGridT& dens_grid,
+                      PlainFilter& plain_filter, index_t from_level, index_t to_level)
 {
     for (index_t lv = from_level; lv != to_level; ++lv)
     {

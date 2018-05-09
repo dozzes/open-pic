@@ -1,10 +1,10 @@
 #include "config.h"
 #include "use_lua.h"
 #include "bind_to_lua.h"
-#include "simulate.h"
 #include "io_utilities.h"
 #include "particles.h"
 #include "grid.h"
+#include "simulate.h"
 
 #include <boost/format.hpp>
 
