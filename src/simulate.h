@@ -46,7 +46,7 @@ void move_particles_full_time(const Grid& grid, Particles& particles,
 
 /***************************************************
 *                                                  *
-* V step ( repeat step I )                         *
+* V step (repeat step I)                           *
 *                                                  *
 * Calculate magnetic field in full time step (m+1) *
 *                                                  *

@@ -10,5 +10,5 @@
 bool is_particle_can_scatter(Particles& particles, index_t p, const Grid& grid, const DblVector& dr);
 bool is_particle_can_move(Particles& particles, index_t p, const Grid& grid);
 
-// Check if particle will be move less thne h/2.
+// Check if particle will be move less then h/2.
 bool check_particle_move(const Particle& particle, const Grid& grid, const DblVector& dr);

@@ -57,7 +57,6 @@ void calc_magnetic_field_half_time(Grid& grid)
 * Move particles in half time step (m+1/2) *
 *                                          *
 *******************************************/
-
 void push_particle_std(const Grid& grid, Particle& rp)
 {
     DblVector Bp;
@@ -228,7 +227,7 @@ void move_particles_full_time(const Grid& grid, Particles& particles,
 
 /***************************************************
 *                                                  *
-* V step ( repeat step I )                         *
+* V step (repeat step I)                           *
 *                                                  *
 * Calculate magnetic field in full time step (m+1) *
 *                                                  *
@@ -241,7 +240,6 @@ void move_particles_full_time(const Grid& grid, Particles& particles,
 * Calculate electron velocities                    *
 *                                                  *
 ***************************************************/
-
 void calc_electrons_velocity(Grid& grid)
 {
     const index_t kd = 1;

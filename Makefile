@@ -1,8 +1,15 @@
-INC = -I/home/dosipyan/opic/3rdparty/boost_1_52_0 \
-	-I/usr/include/lua5.1 \
-	-I/home/dosipyan/opic/3rdparty/luabind-0.8.1
 
-LIB = -L/home/dosipyan/opic/3rdparty/luabind-0.8.1/stage -L/usr/lib
+OPIC_DIR=/home/dosipyan/build_place/opic/open-pic
+
+#FILES = $(shell ls $(OPIC_DIR)/3rdparty/lua-5.1/etc)
+#echo $(FILES)
+
+INC = -I$(OPIC_DIR)/3rdparty/boost_1_52_0 \
+	-I$(OPIC_DIR)/3rdparty/lua-5.1/src \
+	-I$(OPIC_DIR)/3rdparty/lua-5.1/etc \
+	-I$(OPIC_DIR)/3rdparty/luabind-0.8.1/lib/include
+
+LIB = -L$(OPIC_DIR)/3rdparty/luabind-0.8.1/stage -L/usr/lib
 
 CC = g++
 

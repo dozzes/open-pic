@@ -16,7 +16,6 @@
  * equation of motion is solved for active particles only *
  * return true if particles is active, otherwise - false  *
  *********************************************************/
-
 bool is_particle_can_scatter(Particles& particles, index_t p, const Grid& grid, const DblVector& dr)
 {
     if (particles.is_inactive(p))
