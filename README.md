@@ -25,3 +25,5 @@ Build steps for Ubuntu 18:
 
 
 See "main.lua" and other Lua scripts for simulation flow control.
+
+General information about open-pic can be found on comphys.narod.ru.
