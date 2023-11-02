@@ -71,7 +71,7 @@ bool bind_to_lua(const char* lua_cfg_file_name, Grid& grid, Particles& particles
         // bind gather function from_grid_to_point as "pic_gather"
         def("pic_gather", (void(*)(const Grid&, const DblVector&, Grid::NodeType&)) &from_grid_to_point),
 
-        // bind save function from_grid_to_point as "pic_gather"
+        // bind save function from_grid_to_point as "pic_save_grid_node"
         def("pic_save_grid_node", (void(*)(const std::string& prefix, const Grid& grid)) &save_grid_node),
 
         // bind DblVector

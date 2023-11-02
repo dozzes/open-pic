@@ -9,6 +9,9 @@ Depends on luabind and boost libraries.
 
 Build steps for Ubuntu 18:
 
+Install lua
+   sudo apt-get install lua5.1
+
 1. Extract /3rdparty/3rdparty.tar.xz ti the same directory
 2. In Makefile and setup.sh set the OPIC_DIR to your local repo directory path
 3. Run
