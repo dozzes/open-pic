@@ -51,10 +51,8 @@ end  -- cloud_parts_num
    for x = 0, to_x, dist do
    for y = 0, to_y, dist do
    for z = 0, to_z, dist do
-     cx = center_x - x
-     cy = center_y - y
-     cz = center_z - z
-     if math.sqrt(cx*cx + cy*cy + cz*cz) > cloud_R0 then
+     -- x, y and z are offsets from the cloud center.
+     if x*x + y*y + z*z > cloud_R0*cloud_R0 then
        parts_num = parts_num + 1 -- // +++ octant
        if z ~= 0.0 then parts_num = parts_num + 1 end -- // ++- octant
        if y ~= 0.0 then parts_num = parts_num + 1 end -- // +-+ octant

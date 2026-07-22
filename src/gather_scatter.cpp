@@ -126,13 +126,14 @@ void set_boundary_conditions(const std::string& lua_func_name, DensityGrid& dg)
 void scatter_particle_std(const Particle& particle, DensityGrid& grid, const DblVector& dr)
 {
     const double h = Config::h();
+    const DblVector next_r = particle.r + dr;
 
     ParticleGroups part_groups;
     const double q = particle.ni*part_groups[particle.group_name].charge;
 
-    const index_t pi = static_cast<index_t>((particle.r.x + dr.x)/h);
-    const index_t pj = static_cast<index_t>((particle.r.y + dr.y)/h);
-    const index_t pk = static_cast<index_t>((particle.r.z + dr.z)/h);
+    const index_t pi = static_cast<index_t>(floor(next_r.x/h));
+    const index_t pj = static_cast<index_t>(floor(next_r.y/h));
+    const index_t pk = static_cast<index_t>(floor(next_r.z/h));
 
     typedef DensityGrid::NodeType DensityNode;
 
@@ -142,21 +143,21 @@ void scatter_particle_std(const Particle& particle, DensityGrid& grid, const Dbl
     {
         DensityNode& cell = grid(i, j, k);
 
-        cell.NP += q*R((i + 0.5)*h - particle.r.x,
-                       (j + 0.5)*h - particle.r.y,
-                       (k + 0.5)*h - particle.r.z, h);
+        cell.NP += q*R((i + 0.5)*h - next_r.x,
+                       (j + 0.5)*h - next_r.y,
+                       (k + 0.5)*h - next_r.z, h);
 
-        cell.UP.x += q*particle.v.x*R((i)*h       - particle.r.x,
-                                      (j + 0.5)*h - particle.r.y,
-                                      (k + 0.5)*h - particle.r.z, h);
+        cell.UP.x += q*particle.v.x*R((i)*h       - next_r.x,
+                                      (j + 0.5)*h - next_r.y,
+                                      (k + 0.5)*h - next_r.z, h);
 
-        cell.UP.y += q*particle.v.y*R((i + 0.5)*h - particle.r.x,
-                                      (j)*h       - particle.r.y,
-                                      (k + 0.5)*h - particle.r.z, h);
+        cell.UP.y += q*particle.v.y*R((i + 0.5)*h - next_r.x,
+                                      (j)*h       - next_r.y,
+                                      (k + 0.5)*h - next_r.z, h);
 
-        cell.UP.z += q*particle.v.z*R((i + 0.5)*h - particle.r.x,
-                                      (j + 0.5)*h - particle.r.y,
-                                      (k)*h       - particle.r.z, h);
+        cell.UP.z += q*particle.v.z*R((i + 0.5)*h - next_r.x,
+                                      (j + 0.5)*h - next_r.y,
+                                      (k)*h       - next_r.z, h);
     }
 }
 

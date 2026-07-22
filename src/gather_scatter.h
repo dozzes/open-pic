@@ -151,15 +151,20 @@ double gather_vector(const GridT& grid, const DblVector& at_point,
     const double h = grid.step();
 
     // home cell node indexes
-    const index_t pi = static_cast<index_t>(at_point.x/h - Centering::x());
-    const index_t pj = static_cast<index_t>(at_point.y/h - Centering::y());
-    const index_t pk = static_cast<index_t>(at_point.z/h - Centering::z());
+    const long pi = static_cast<long>(floor(at_point.x/h - Centering::x()));
+    const long pj = static_cast<long>(floor(at_point.y/h - Centering::y()));
+    const long pk = static_cast<long>(floor(at_point.z/h - Centering::z()));
+
+    if (pi < 0 || pi + 1 >= static_cast<long>(grid.size_x()) ||
+        pj < 0 || pj + 1 >= static_cast<long>(grid.size_y()) ||
+        pk < 0 || pk + 1 >= static_cast<long>(grid.size_z()))
+        throw std::out_of_range("gather point is outside the grid");
 
     double ret_val = 0.0;
 
-    for (index_t i = pi; i != pi+2; ++i)
-    for (index_t j = pj; j != pj+2; ++j)
-    for (index_t k = pk; k != pk+2; ++k)
+    for (index_t i = static_cast<index_t>(pi); i != static_cast<index_t>(pi+2); ++i)
+    for (index_t j = static_cast<index_t>(pj); j != static_cast<index_t>(pj+2); ++j)
+    for (index_t k = static_cast<index_t>(pk); k != static_cast<index_t>(pk+2); ++k)
     {
         ret_val += (grid(i,j,k).*vec.*comp)*R((i + Centering::x())*h - at_point.x,
                                               (j + Centering::y())*h - at_point.y,
@@ -192,15 +197,20 @@ double gather_scalar(const GridT& grid, const DblVector& at_point,
     const double h = grid.step();
 
     // home cell node indexes
-    const index_t pi = static_cast<index_t>(at_point.x/h - Centering::x());
-    const index_t pj = static_cast<index_t>(at_point.y/h - Centering::y());
-    const index_t pk = static_cast<index_t>(at_point.z/h - Centering::z());
+    const long pi = static_cast<long>(floor(at_point.x/h - Centering::x()));
+    const long pj = static_cast<long>(floor(at_point.y/h - Centering::y()));
+    const long pk = static_cast<long>(floor(at_point.z/h - Centering::z()));
+
+    if (pi < 0 || pi + 1 >= static_cast<long>(grid.size_x()) ||
+        pj < 0 || pj + 1 >= static_cast<long>(grid.size_y()) ||
+        pk < 0 || pk + 1 >= static_cast<long>(grid.size_z()))
+        throw std::out_of_range("gather point is outside the grid");
 
     double ret_val = 0.0;
 
-    for (index_t i = pi; i != pi+2; ++i)
-    for (index_t j = pj; j != pj+2; ++j)
-    for (index_t k = pk; k != pk+2; ++k)
+    for (index_t i = static_cast<index_t>(pi); i != static_cast<index_t>(pi+2); ++i)
+    for (index_t j = static_cast<index_t>(pj); j != static_cast<index_t>(pj+2); ++j)
+    for (index_t k = static_cast<index_t>(pk); k != static_cast<index_t>(pk+2); ++k)
     {
         ret_val += (grid(i,j,k).*val)*R((i + Centering::x())*h - at_point.x,
                                         (j + Centering::y())*h - at_point.y,

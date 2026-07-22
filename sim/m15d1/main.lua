@@ -487,11 +487,8 @@ do
   for y = 0, to_y, backgr_part_dist do
   for z = 0, to_z, backgr_part_dist do
 
-     local cx = cloud_x - x
-     local cy = cloud_y - y
-     local cz = cloud_z - z
-
-     if (math.sqrt(cx*cx + cy*cy + cz*cz) > cloud_R0) then
+     -- x, y and z are offsets from the cloud center.
+     if (x*x + y*y + z*z > cloud_R0*cloud_R0) then
 
        -- octant 000
        local px = x --+ rnd(backgr_part_dist)
