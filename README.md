@@ -2,12 +2,19 @@
 open-pic
 ========
 
+New version
+-----------
+
+The [dozzes/open-pic-3](https://github.com/dozzes/open-pic-3) repository contains
+a new, redesigned version of open-pic that accounts for electron temperature,
+resistivity, and thermal conductivity.
+
 open-pic is a 3D [Particle-In-Cell (PIC) code](https://en.wikipedia.org/wiki/Particle-in-cell)
 for collisionless plasma simulation.
 Depends on luabind and boost libraries.
 
 
-Build steps for Ubuntu 18:
+Build steps for the open-pic version in this repository (Ubuntu 18):
 
 Install lua
    sudo apt-get install lua5.1
